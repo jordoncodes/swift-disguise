@@ -11,7 +11,7 @@ class PlayerExtensions {
             return Nicknamer.getDisguiser().getNick(this);
         }
 
-        fun Player.setNickname(nick: String) {
+        fun Player.setNick(nick: String) {
             Nicknamer.getDisguiser().setNick(this, nick);
         }
 
