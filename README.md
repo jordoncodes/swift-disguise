@@ -39,7 +39,7 @@ val player = ... // get the player, e.g. Bukkit.getPlayer(UUID)
 player.setNick("nickname")
 val name = player.getNick()
 player.setSkin("Notch")
-player.setSkinLayerVisible(player, SkinLayers.SkinLayer.CAPE, false); // hide cape
+player.setSkinLayerVisible(player, SkinLayers.SkinLayer.CAPE, false) // hide cape
 player.refresh()
 ```
 
