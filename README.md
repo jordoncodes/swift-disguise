@@ -10,15 +10,24 @@ The main features of this API are: changing a player's name, changing a player's
 ## Basic Usage
 
 ### maven
-An example of the dependency in a maven project is (have the Nicknaming-API.jar in a `libs` folder)
+Include the dependency in a maven project:
 ```xml
-<dependency>
-    <groupId>me.onlyjordon</groupId>
-    <artifactId>Nicknaming-API</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <scope>system</scope>
-    <systemPath>${basedir}/libs/Nicknaming-API.jar</systemPath>
-</dependency>
+<repositories>
+    <!-- other repositories -->
+    <repository>
+        <id>jitpack</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+<dependencies>
+    <!-- other dependencies -->
+    <dependency>
+        <groupId>com.github.jordoncodes</groupId>
+        <artifactId>nicknamer-api</artifactId>
+        <version>v1.0.0</version>
+        <scope>provided</scope>
+    </dependency>
+</dependencies>
 ```
 
 After that you can simply:
