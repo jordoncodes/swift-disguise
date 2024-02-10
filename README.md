@@ -4,8 +4,8 @@ This is a simple API that allows you to nickname a player. It currently supports
 ## Features:
 The main features of this API are: changing a player's name, changing a player's skin, giving the player a prefix/suffix using a scoreboard team packet. If you want a new version, feel free to make an issue!
 
-# This is early in development and WILL change.
-# You can download in the releases section. Or on [SpigotMC](https://www.spigotmc.org/resources/nicknamer-api.115002/)
+# This is early in development and WILL change!
+# You can download in the releases section, on [SpigotMC](https://www.spigotmc.org/resources/nicknamer-api.115002/) or on [PaperMC Hangar](https://hangar.papermc.io/onlyjordon/Nicknamer-API).
 
 ## Basic Usage
 
@@ -29,6 +29,7 @@ NMSDisguiser disguiser = Nicknamer.getDisguiser();
 // then call:
 disguiser.setNick(player, "nickname");
 disguiser.setSkin(player, "Notch");
+disguiser.setSkinLayerVisible(player, SkinLayers.SkinLayer.CAPE, false); // hide cape
 disguiser.refreshPlayer(player);
 ```
 
@@ -38,11 +39,15 @@ val player = ... // get the player, e.g. Bukkit.getPlayer(UUID)
 player.setNick("nickname")
 val name = player.getNick()
 player.setSkin("Notch")
+player.setSkinLayerVisible(player, SkinLayers.SkinLayer.CAPE, false); // hide cape
 player.refresh()
 ```
 
 You could also use Nicknamer-API to set prefixes and suffixes for players. This uses scoreboard team packets, and will put the prefix & suffix in the player nametag and in the tablist. Example:
 ```java
-disguiser.setPrefixSuffix(player, Component.text(ChatColor.RED+"Prefix"), Component.text(ChatColor.GREEN+"Suffix"), ChatColor.WHITE);
+// set the prefix/suffix values:
+disguiser.setPrefixSuffix(player, Component.text(ChatColor.RED+"Prefix"), Component.text(ChatColor.GREEN+"Suffix"), ChatColor.WHITE); 
+// apply the change:
+Nicknamer.getDisguiser().updatePrefixSuffix(player);
 ```
 This would make the name of the player in the tablist and above their head "Prefix {player's nickname} Suffix". This uses [Adventure](https://docs.advntr.dev/index.html).
