@@ -24,7 +24,7 @@ Include the dependency in a maven project:
     <dependency>
         <groupId>com.github.jordoncodes</groupId>
         <artifactId>nicknamer-api</artifactId>
-        <version>v1.0.0</version>
+        <version>v1.0.1</version>
         <scope>provided</scope>
     </dependency>
 </dependencies>
