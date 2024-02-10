@@ -192,7 +192,7 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
     }
 
     private fun sendScoreboardRemovePacket(toRemove: Player, toSend: Player) {
-        getTeamPacket(toRemove, net.kyori.adventure.text.Component.text(""), net.kyori.adventure.text.Component.text(""), ChatColor.WHITE, 1).let { packet ->
+        getTeamPacket(toRemove, net.kyori.adventure.text.Component.text(""), net.kyori.adventure.text.Component.text(""), ChatColor.WHITE, 1, 0).let { packet ->
             (toSend as CraftPlayer).handle.connection.send(packet)
         }
     }
@@ -282,18 +282,18 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
         return Parameters(byteBuf)
     }
 
-    private fun getTeamPacket(player: Player, prefix: TextComponent, suffix: TextComponent, textColor: ChatColor, method: Int): ClientboundSetPlayerTeamPacket {
+    private fun getTeamPacket(player: Player, prefix: TextComponent, suffix: TextComponent, textColor: ChatColor, method: Int, priority: Int): ClientboundSetPlayerTeamPacket {
         return setPlayerTeamPacketConstructor!!.newInstance(
-            player.uniqueId.toString().replace('-', Character.MIN_VALUE).subSequence(0, 16),
+            (priority.toChar()+player.uniqueId.toString().replace('-', Character.MIN_VALUE)).substring(0, 16),
             method,
             Optional.of(getParameters(player, prefix, suffix, ChatFormatting.getByCode(textColor.char)!!)),
             listOf(getNick(player))
         )
     }
 
-    override fun setPrefixSuffix(player: Player, prefix: TextComponent, suffix: TextComponent, textColor: ChatColor) {
+    override fun setPrefixSuffix(player: Player, prefix: TextComponent, suffix: TextComponent, textColor: ChatColor, priority: Int) {
         setFields()
-        prefixSuffix[player] = getTeamPacket(player, prefix, suffix, textColor, 0)
+        prefixSuffix[player] = getTeamPacket(player, prefix, suffix, textColor, 0, priority)
     }
 
     override fun updatePrefixSuffix(player: Player) {

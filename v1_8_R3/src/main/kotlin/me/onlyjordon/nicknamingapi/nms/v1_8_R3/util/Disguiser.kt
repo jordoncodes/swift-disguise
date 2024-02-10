@@ -121,10 +121,10 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
     }
 
 
-    private fun getPrefixSuffixPacket(player: Player, prefix: TextComponent = Component.text(""), suffix: TextComponent = Component.text(""), textColor: ChatColor = ChatColor.WHITE, remove: Boolean = false): PacketPlayOutScoreboardTeam {
+    private fun getPrefixSuffixPacket(player: Player, prefix: TextComponent = Component.text(""), suffix: TextComponent = Component.text(""), textColor: ChatColor = ChatColor.WHITE, remove: Boolean = false, priority: Int = 0): PacketPlayOutScoreboardTeam {
         val packet = PacketPlayOutScoreboardTeam()
-        ReflectionHelper.setFieldValue("a", player.uniqueId.toString().replace('-', Character.MIN_VALUE).subSequence(0,16).toString(), packet) // team name
-        ReflectionHelper.setFieldValue("b", player.uniqueId.toString().replace('-', Character.MIN_VALUE).subSequence(0,16).toString(), packet) // team display name
+        ReflectionHelper.setFieldValue("a", priority.toChar()+ player.uniqueId.toString().replace('-', Character.MIN_VALUE).substring(0,16), packet) // team name
+        ReflectionHelper.setFieldValue("b", priority.toChar()+ player.uniqueId.toString().replace('-', Character.MIN_VALUE).substring(0,16), packet) // team display name
         ReflectionHelper.setFieldValue("c", LegacyComponentSerializer.legacySection().serialize(prefix), packet) // prefix
         ReflectionHelper.setFieldValue("d", LegacyComponentSerializer.legacySection().serialize(suffix), packet) // suffix
         ReflectionHelper.setFieldValue("e", EnumNameTagVisibility.ALWAYS.e, packet) // nametag visibility
@@ -229,7 +229,7 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
         data[player.uniqueId]?.nickname = null
     }
 
-    override fun setPrefixSuffix(player: Player, prefix: TextComponent, suffix: TextComponent, textColor: ChatColor) {
+    override fun setPrefixSuffix(player: Player, prefix: TextComponent, suffix: TextComponent, textColor: ChatColor, priority: Int) {
         val reset = Component.text(ChatColor.RESET.toString()+textColor.toString())
         var pre = prefix
         var suf = suffix
@@ -240,7 +240,7 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
             suf = Component.text(LegacyComponentSerializer.legacySection().serialize(prefix).substring(0, 12))
         }
 
-        val packet = getPrefixSuffixPacket(player, pre.append(reset), reset.append(suf), textColor, remove = false)
+        val packet = getPrefixSuffixPacket(player, pre.append(reset), reset.append(suf), textColor, remove = false, priority = priority)
         prefixSuffix[player] = packet
     }
 

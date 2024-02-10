@@ -43,6 +43,6 @@ player.refresh()
 
 You could also use Nicknamer-API to set prefixes and suffixes for players. This uses scoreboard team packets, and will put the prefix & suffix in the player nametag and in the tablist. Example:
 ```java
-disguiser.setPrefixSuffix(player, Component.text(ChatColor.RED+"Prefix"), Component.text(ChatColor.GREEN+"Suffix"), ChatColor.WHITE);
+disguiser.setPrefixSuffix(player, Component.text(ChatColor.RED+"Prefix"), Component.text(ChatColor.GREEN+"Suffix"), ChatColor.WHITE, 0); // the last int is the priority in the tablist, higher = lower in the tablist.
 ```
 This would make the name of the player in the tablist and above their head "Prefix {player's nickname} Suffix". This uses [Adventure](https://docs.advntr.dev/index.html).

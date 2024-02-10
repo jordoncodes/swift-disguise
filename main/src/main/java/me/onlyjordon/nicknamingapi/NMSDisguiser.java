@@ -103,8 +103,9 @@ public abstract class NMSDisguiser {
      * @param prefix the prefix to set
      * @param suffix the suffix to set
      * @param color the color of the name. Applies to prefix, suffix & name
+     * @param priority the priority of the name. The higher the priority, the lower it will be in the tab list. 0 is the highest priority.
      */
-    public abstract void setPrefixSuffix(@NotNull Player player, @NotNull TextComponent prefix, @NotNull TextComponent suffix, @NotNull ChatColor color);
+    public abstract void setPrefixSuffix(@NotNull Player player, @NotNull TextComponent prefix, @NotNull TextComponent suffix, @NotNull ChatColor color, int priority);
 
     /**
      * Sends the prefix/suffix to players

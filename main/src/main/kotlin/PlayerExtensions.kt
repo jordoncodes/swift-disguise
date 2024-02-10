@@ -32,8 +32,8 @@ class PlayerExtensions {
             Nicknamer.getDisguiser().refreshPlayer(this)
         }
 
-        fun Player.setPrefixSuffix(prefix: TextComponent, suffix: TextComponent, textColor: ChatColor) {
-            Nicknamer.getDisguiser().setPrefixSuffix(this, prefix, suffix, textColor)
+        fun Player.setPrefixSuffix(prefix: TextComponent, suffix: TextComponent, textColor: ChatColor, priority: Int) {
+            Nicknamer.getDisguiser().setPrefixSuffix(this, prefix, suffix, textColor, priority)
         }
 
         fun Player.setSkinLayerVisible(layer: SkinLayer, visible: Boolean) {

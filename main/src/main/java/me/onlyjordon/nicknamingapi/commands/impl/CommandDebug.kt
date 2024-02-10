@@ -1,5 +1,6 @@
 package me.onlyjordon.nicknamingapi.commands.impl
 
+import PlayerExtensions.Companion.setSkinLayerVisible
 import me.onlyjordon.nicknamingapi.Nicknamer
 import me.onlyjordon.nicknamingapi.commands.PlayerOnlyCommand
 import me.onlyjordon.nicknamingapi.utils.SkinLayers
@@ -40,7 +41,7 @@ class CommandDebug : PlayerOnlyCommand("debug", "debug.use") {
                 return true
             }
             if ("prefixsuffix".equals(args[0], ignoreCase = true)) {
-                Nicknamer.getDisguiser().setPrefixSuffix(player, Component.text("Admin ").color { TextColor.color(0xff0000).value() }, Component.text(" [Loser]").color { TextColor.color(0xff0000).value() }, ChatColor.WHITE)
+                Nicknamer.getDisguiser().setPrefixSuffix(player, Component.text("Admin ").color { TextColor.color(0xff0000).value() }, Component.text(" [Loser]").color { TextColor.color(0xff0000).value() }, ChatColor.WHITE, 1_000_000)
                 Nicknamer.getDisguiser().updatePrefixSuffix(player)
                 player.sendMessage("Prefix and suffix set!")
                 return true
@@ -48,7 +49,7 @@ class CommandDebug : PlayerOnlyCommand("debug", "debug.use") {
             if ("skinlayers".equals(args[0], ignoreCase = true)) {
                 player.sendMessage("Setting skin layers to 0...")
                 SkinLayers.SkinLayer.entries.forEach {
-                    Nicknamer.getDisguiser().setSkinLayerVisible(player, it, false)
+                    player.setSkinLayerVisible(it, false)
                 }
                 player.sendMessage("Skin layers set!")
                 return true
