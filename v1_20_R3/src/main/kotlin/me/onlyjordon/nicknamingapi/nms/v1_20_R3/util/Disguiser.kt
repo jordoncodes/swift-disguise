@@ -39,9 +39,11 @@ import org.bukkit.event.player.PlayerChangedWorldEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
+import org.jetbrains.annotations.ApiStatus.Internal
 import java.lang.reflect.Constructor
 import java.util.*
 
+@Internal
 class Disguiser: Listener,PacketListener,NMSDisguiser() {
     private val prefixSuffix = WeakHashMap<Player, ClientboundSetPlayerTeamPacket>()
 

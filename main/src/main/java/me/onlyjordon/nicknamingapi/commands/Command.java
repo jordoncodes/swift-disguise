@@ -7,11 +7,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.permissions.Permission;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@ApiStatus.Internal
 public abstract class Command extends org.bukkit.command.Command implements CommandExecutor, TabCompleter {
 
     private final transient Map<String, String> usageStrings;

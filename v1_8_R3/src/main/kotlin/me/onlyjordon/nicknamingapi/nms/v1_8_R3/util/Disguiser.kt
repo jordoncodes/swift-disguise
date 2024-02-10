@@ -17,14 +17,14 @@ import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import me.onlyjordon.nicknamingapi.NMSDisguiser
 import me.onlyjordon.nicknamingapi.NickData
-import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.destroyPacket
-import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.getSetMetadataPacket
-import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.playerInfoPacket
-import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.playerSpawnPacket
-import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.setFields
-import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.setPlayerInfoData
-import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.updateClient
-import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.worldServer
+import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.destroyPacket
+import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.getSetMetadataPacket
+import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.playerInfoPacket
+import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.playerSpawnPacket
+import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.setFields
+import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.setPlayerInfoData
+import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.updateClient
+import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.worldServer
 import me.onlyjordon.nicknamingapi.utils.ReflectionHelper
 import me.onlyjordon.nicknamingapi.utils.Skin
 import me.onlyjordon.nicknamingapi.utils.SkinLayers
@@ -45,9 +45,10 @@ import org.bukkit.event.player.PlayerChangedWorldEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
+import org.jetbrains.annotations.ApiStatus.Internal
 import java.util.*
 
-
+@Internal
 @Suppress("unused")
 class Disguiser : PacketListener,Listener, NMSDisguiser() {
 

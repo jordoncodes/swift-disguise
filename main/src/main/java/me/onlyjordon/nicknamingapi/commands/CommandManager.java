@@ -1,5 +1,8 @@
 package me.onlyjordon.nicknamingapi.commands;
 
+import org.jetbrains.annotations.ApiStatus;
+
+@ApiStatus.Internal
 public interface CommandManager {
     void updateCommandMap();
 
