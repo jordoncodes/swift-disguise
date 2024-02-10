@@ -2,10 +2,10 @@
 This is a simple API that allows you to nickname a player. It currently supports Spigot 1.8.8 and 1.20.4 and paper for both versions. For 1.8 users, I would recommend using a fork like [PandaSpigot](https://github.com/hpfxd/PandaSpigot).
 
 ## Features:
-The main features of this API are: changing a player's name, changing a player's skin, giving the player a prefix/suffix using a scoreboard team packet.
+The main features of this API are: changing a player's name, changing a player's skin, giving the player a prefix/suffix using a scoreboard team packet. If you want a new version, feel free to make an issue!
 
 # This is early in development and WILL change.
-# You can download in the releases section.
+# You can download in the releases section. Or on [SpigotMC](https://www.spigotmc.org/resources/nicknamer-api.115002/)
 
 ## Basic Usage
 
