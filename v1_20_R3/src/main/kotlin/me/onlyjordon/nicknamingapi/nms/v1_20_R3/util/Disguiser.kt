@@ -8,13 +8,16 @@ import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.protocol.player.TextureProperty
 import com.github.retrooper.packetevents.protocol.player.UserProfile
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoRemove
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity
 import com.mojang.authlib.properties.Property
 import io.netty.buffer.Unpooled
 import me.onlyjordon.nicknamingapi.NMSDisguiser
+import me.onlyjordon.nicknamingapi.NickData
 import me.onlyjordon.nicknamingapi.utils.Skin
+import me.onlyjordon.nicknamingapi.utils.SkinLayers
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer
 import net.minecraft.ChatFormatting
@@ -35,11 +38,11 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerChangedWorldEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.plugin.java.JavaPlugin
 import java.lang.reflect.Constructor
 import java.util.*
 
 class Disguiser: Listener,PacketListener,NMSDisguiser() {
-    private val fakeUUIDs = WeakHashMap<UUID, UUID>()
     private val prefixSuffix = WeakHashMap<Player, ClientboundSetPlayerTeamPacket>()
 
     private var setPlayerTeamPacketConstructor: Constructor<ClientboundSetPlayerTeamPacket>? = null
@@ -57,16 +60,18 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
     }
 
     private fun getFakeUUID(player: Player): UUID {
-        val id = fakeUUIDs.getOrDefault(player.uniqueId, UUID.randomUUID())
-        fakeUUIDs[player.uniqueId] = id
+        val d = data[player.uniqueId] ?: return UUID.randomUUID()
+        val id = d.fakeUUID ?: UUID.randomUUID()
+        d.fakeUUID = id
+        return id
+    }
+    private fun getFakeUUID(uuid: UUID): UUID {
+        val d = data[uuid] ?: return UUID.randomUUID()
+        val id = d.fakeUUID ?: UUID.randomUUID()
+        d.fakeUUID = id
         return id
     }
 
-    private fun getFakeUUID(uuid: UUID): UUID {
-        val id = fakeUUIDs.getOrDefault(uuid, UUID.randomUUID())
-        fakeUUIDs[uuid] = id
-        return id
-    }
 
     override fun disable() {
         PacketEvents.getAPI().terminate()
@@ -79,7 +84,9 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
     }
 
     override fun getSkin(player: Player): Skin {
-        return currentSkins.getOrDefault(player, originalSkins.getOrDefault(player, Skin(null, null)))
+        val d = data[player.uniqueId] ?: return Skin(null, null)
+        d.currentSkin = d.currentSkin ?: d.originalSkin ?: Skin(null, null)
+        return d.currentSkin
     }
 
     override fun getSkin(skinName: String): Skin {
@@ -114,6 +121,21 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
                 packet.uuid = Optional.of(id)
             }
         }
+        if (event.packetType == PacketType.Play.Server.ENTITY_METADATA) {
+            val packet = WrapperPlayServerEntityMetadata(event)
+            var metadataPlayer: Player? = null
+            Bukkit.getOnlinePlayers().forEach {
+                if (packet.entityId == it.entityId) {
+                    metadataPlayer = it
+                }
+            }
+            if (metadataPlayer == null) return
+            packet.entityMetadata.forEach {
+                if (it.index == 17) { // skin layers
+                    it.value = data[metadataPlayer!!.uniqueId]?.skinLayers?.rawSkinLayers ?: it.value
+                }
+            }
+        }
     }
 
     private fun changeProfile(profile: UserProfile, hideUUID: Boolean = true) {
@@ -121,20 +143,31 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
         val other = Bukkit.getOfflinePlayer(uuid)
         if (!other.isOnline) return
         if (other !is Player) return
+        val data = data[uuid] ?: return
         val id = getFakeUUID(other)
-        profile.name = nicknames.getOrDefault(other.player, other.name)
+        profile.name = data.nickname ?: other.name
         if (hideUUID) profile.uuid = id // fake uuid
-        var skin = currentSkins[other]
-        if (skin == null) skin = originalSkins[other]
-        if (skin == null) return
+        val skin = data.currentSkin ?: data.originalSkin ?: Skin(null, null)
         profile.textureProperties = listOf(TextureProperty("textures", skin.value, skin.signature))
     }
 
     @EventHandler
     fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
-        setNick(player, getNick(player))
-        originalSkins[player] = (player as CraftPlayer).profile.properties.get("textures").firstOrNull()?.let { Skin(it.value, it.signature) }
+        val metadata = (player as CraftPlayer).handle.entityData
+        var rawLayers = 0.toByte()
+        metadata.nonDefaultValues?.forEach {
+            if (it.id == 17)
+                if (it.value is Byte) rawLayers = it.value as Byte
+        }
+        data[player.uniqueId] = NickData(
+            player.profile.properties.get("textures").firstOrNull()?.let { Skin(it.value, it.signature) },
+            player.name,
+            net.kyori.adventure.text.Component.text(""),
+            net.kyori.adventure.text.Component.text(""),
+            SkinLayers.getFromRaw(rawLayers),
+            UUID.randomUUID()
+        )
         prefixSuffix.values.forEach {
             player.handle.connection.send(it)
         }
@@ -143,16 +176,20 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
     @EventHandler
     fun onQuit(e: PlayerQuitEvent) {
         val player = e.player
-        originalSkins.remove(player)
-        currentSkins.remove(player)
-        nicknames.remove(player)
+        val plugin = JavaPlugin.getProvidingPlugin(this.javaClass)
+        if (plugin.isEnabled) {
+            // to allow for info remove packet to be altered
+            Bukkit.getServer().scheduler.runTaskLater(plugin, Runnable {
+                data.remove(player.uniqueId)
+            }, 2L)
+        }
         Bukkit.getOnlinePlayers().forEach {
-            sendPacketRemove(player, it)
+            sendScoreboardRemovePacket(player, it)
         }
         prefixSuffix.remove(player)
     }
 
-    private fun sendPacketRemove(toRemove: Player, toSend: Player) {
+    private fun sendScoreboardRemovePacket(toRemove: Player, toSend: Player) {
         getTeamPacket(toRemove, net.kyori.adventure.text.Component.text(""), net.kyori.adventure.text.Component.text(""), ChatColor.WHITE, 1).let { packet ->
             (toSend as CraftPlayer).handle.connection.send(packet)
         }
@@ -167,17 +204,21 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
         player.location.world.players.forEach {
             if (it != player) {
                 it.hidePlayer(player)
-                it.showPlayer(player)
             }
         }
         if (!player.isOnline) return
         for (other in player.location.world.players) {
-            val entityPlayer = (other as CraftPlayer).handle
-            entityPlayer.sendPlayerInfoRemovePacket(player)
-            entityPlayer.sendPlayerInfoUpdatePacket(player, Action.ADD_PLAYER)
-            entityPlayer.sendPlayerInfoUpdatePacket(player, Action.UPDATE_LISTED)
-            entityPlayer.sendSetEntityMetadataPacket(player)
+            val otherNMSEntity = (other as CraftPlayer).handle
+            otherNMSEntity.sendPlayerInfoRemovePacket(player)
+            otherNMSEntity.sendPlayerInfoUpdatePacket(player, Action.ADD_PLAYER)
+            otherNMSEntity.sendPlayerInfoUpdatePacket(player, Action.UPDATE_LISTED)
+            otherNMSEntity.sendSetEntityMetadataPacket(player)
             prefixSuffix[player]?.let { other.handle.connection.send(it) }
+        }
+        player.location.world.players.forEach {
+            if (it != player) {
+                it.showPlayer(player)
+            }
         }
         val entityPlayer = (player as CraftPlayer).handle
 
@@ -188,10 +229,11 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
     }
 
     override fun setSkin(player: Player, skin: Skin): Boolean { // maybe replace with Paper's API for it?
+        val data = data[player.uniqueId] ?: return false
         val craftPlayer = player as CraftPlayer
         craftPlayer.profile.properties.removeAll("textures")
         craftPlayer.profile.properties.put("textures", Property("textures", skin.value, skin.signature))
-        currentSkins[player] = skin
+        data.currentSkin = skin
         return true
     }
 
@@ -199,12 +241,24 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
         setSkin(player, Skin.getSkin(name))
     }
 
-    override fun setNick(player: Player, nick: String) {
-        nicknames[player] = nick
+    override fun setSkinLayerVisible(player: Player, layer: SkinLayers.SkinLayer, visible: Boolean) {
+        val layers = data[player.uniqueId]?.skinLayers ?: return
+        layers.setLayerVisible(layer, visible)
+        data[player.uniqueId]?.skinLayers = layers
     }
 
-    override fun resetNick(player: Player?) {
-        nicknames.remove(player)
+    override fun isSkinLayerVisible(player: Player, layer: SkinLayers.SkinLayer): Boolean {
+        return data[player.uniqueId]?.skinLayers?.isLayerVisible(layer) ?: true
+    }
+
+    override fun setNick(player: Player, nick: String) {
+        val data = data[player.uniqueId] ?: return
+        data.nickname = nick
+    }
+
+    override fun resetNick(player: Player) {
+        val data = data[player.uniqueId] ?: return
+        data.nickname = null
     }
 
     override fun resetDisguise(player: Player) {
@@ -240,12 +294,21 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
         prefixSuffix[player] = getTeamPacket(player, prefix, suffix, textColor, 0)
     }
 
+    override fun updatePrefixSuffix(player: Player) {
+        Bukkit.getOnlinePlayers().forEach {
+            sendScoreboardRemovePacket(player, it)
+            prefixSuffix[player]?.let { packet ->
+                (it as CraftPlayer).handle.connection.send(packet)
+            }
+        }
+    }
+
     override fun getNick(player: Player): String {
-        return nicknames.getOrDefault(player, player.name)
+        return data[player.uniqueId]?.nickname ?: player.name
     }
 
     override fun getPlayerWithNick(nick: String): Player? {
-        return nicknames.entries.firstOrNull { it.value.lowercase() == nick.lowercase() }?.key
+        return data.entries.firstOrNull { it.value.nickname?.lowercase() == nick.lowercase() }?.key?.let { Bukkit.getPlayer(it) }
     }
 
 

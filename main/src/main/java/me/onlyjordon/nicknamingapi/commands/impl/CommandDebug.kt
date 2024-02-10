@@ -2,43 +2,53 @@ package me.onlyjordon.nicknamingapi.commands.impl
 
 import me.onlyjordon.nicknamingapi.Nicknamer
 import me.onlyjordon.nicknamingapi.commands.PlayerOnlyCommand
+import me.onlyjordon.nicknamingapi.utils.SkinLayers
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
 class CommandDebug : PlayerOnlyCommand("debug", "debug.use") {
-    override fun execute(sender: Player, args: Array<String>): Boolean {
+    override fun execute(player: Player, args: Array<String>): Boolean {
         if (args.size >= 2) {
             if ("skin".equals(args[0], ignoreCase = true)) {
-                sender.sendMessage("Setting skin...")
-                Nicknamer.getDisguiser().setSkin(sender, args[1])
-                sender.sendMessage("Skin set!")
+                player.sendMessage("Setting skin...")
+                Nicknamer.getDisguiser().setSkin(player, args[1])
+                player.sendMessage("Skin set!")
                 return true
             }
             if ("nick".equals(args[0], ignoreCase = true)) {
-                sender.sendMessage("Set nick to " + args[1])
-                Nicknamer.getDisguiser().setNick(sender, args[1])
+                player.sendMessage("Set nick to " + args[1])
+                Nicknamer.getDisguiser().setNick(player, args[1])
                 return true
             }
             if ("nickandskin".equals(args[0], ignoreCase = true)) {
-                sender.sendMessage("Setting skin and nick...")
-                Nicknamer.getDisguiser().setSkin(sender, args[1])
-                Nicknamer.getDisguiser().setNick(sender, args[1])
-                sender.sendMessage("Skin and nick set!")
-                Nicknamer.getDisguiser().refreshPlayer(sender)
+                player.sendMessage("Setting skin and nick...")
+                Nicknamer.getDisguiser().setSkin(player, args[1])
+                Nicknamer.getDisguiser().setNick(player, args[1])
+                player.sendMessage("Skin and nick set!")
+                Nicknamer.getDisguiser().refreshPlayer(player)
                 return true
             }
         }
         if (args.isNotEmpty()) {
             if ("refresh".equals(args[0], ignoreCase = true)) {
-                sender.sendMessage("Refreshing...")
-                Nicknamer.getDisguiser().refreshPlayer(sender)
+                player.sendMessage("Refreshing...")
+                Nicknamer.getDisguiser().refreshPlayer(player)
                 return true
             }
             if ("prefixsuffix".equals(args[0], ignoreCase = true)) {
-                Nicknamer.getDisguiser().setPrefixSuffix(sender, Component.text("Admin ").color { TextColor.color(0xff0000).value() }, Component.text(" [Loser]").color { TextColor.color(0xff0000).value() }, ChatColor.WHITE)
-                sender.sendMessage("Prefix and suffix set!")
+                Nicknamer.getDisguiser().setPrefixSuffix(player, Component.text("Admin ").color { TextColor.color(0xff0000).value() }, Component.text(" [Loser]").color { TextColor.color(0xff0000).value() }, ChatColor.WHITE)
+                Nicknamer.getDisguiser().updatePrefixSuffix(player)
+                player.sendMessage("Prefix and suffix set!")
+                return true
+            }
+            if ("skinlayers".equals(args[0], ignoreCase = true)) {
+                player.sendMessage("Setting skin layers to 0...")
+                SkinLayers.SkinLayer.entries.forEach {
+                    Nicknamer.getDisguiser().setSkinLayerVisible(player, it, false)
+                }
+                player.sendMessage("Skin layers set!")
                 return true
             }
 
@@ -53,7 +63,7 @@ class CommandDebug : PlayerOnlyCommand("debug", "debug.use") {
             put("nickandskin", 0)
             put("refresh", 0)
             put("prefixsuffix", 0)
-            if ("refresh".equals(args[0], ignoreCase = true) || "prefixsuffix".equals(args[0], ignoreCase = true)) return@apply
+            put("skinlayers", 0)
             put("example", 1)
 
         }

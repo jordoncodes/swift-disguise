@@ -4,16 +4,21 @@ import PlayerExtensions.Companion.getNick
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.event.PacketListener
 import com.github.retrooper.packetevents.event.PacketListenerPriority
+import com.github.retrooper.packetevents.event.PacketReceiveEvent
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.protocol.player.TextureProperty
 import com.github.retrooper.packetevents.protocol.player.UserProfile
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnPlayer
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import me.onlyjordon.nicknamingapi.NMSDisguiser
+import me.onlyjordon.nicknamingapi.NickData
 import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.destroyPacket
+import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.getSetMetadataPacket
 import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.playerInfoPacket
 import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.playerSpawnPacket
 import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.setFields
@@ -22,6 +27,7 @@ import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.up
 import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.Companion.worldServer
 import me.onlyjordon.nicknamingapi.utils.ReflectionHelper
 import me.onlyjordon.nicknamingapi.utils.Skin
+import me.onlyjordon.nicknamingapi.utils.SkinLayers
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
@@ -42,7 +48,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
 
-@Suppress("unused", "deprecation")
+@Suppress("unused")
 class Disguiser : PacketListener,Listener, NMSDisguiser() {
 
     private val fakeUUIDs = WeakHashMap<Player, UUID>()
@@ -59,11 +65,11 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
     }
 
     override fun getNick(player: Player): String {
-        return nicknames.getOrDefault(player, player.name)
+        return data[player.uniqueId]?.nickname ?: player.name
     }
 
     override fun getPlayerWithNick(nick: String): Player? {
-        return nicknames.entries.firstOrNull { it.value.lowercase() == nick.lowercase() }?.key
+        return data.entries.firstOrNull { it.value.nickname.lowercase() == nick.lowercase() }?.key?.let {Bukkit.getPlayer(it)}
     }
 
     override fun setup() {
@@ -72,7 +78,7 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
     }
 
     override fun getSkin(player: Player): Skin {
-        return currentSkins.getOrDefault(player, originalSkins.getOrDefault(player, Skin(null, null)))
+        return data[player.uniqueId]?.currentSkin ?: data[player.uniqueId]?.originalSkin ?: Skin(null, null)
     }
 
     override fun getSkin(skinName: String): Skin {
@@ -83,18 +89,15 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
     @EventHandler
     fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
-        setNick(player, getNick(player))
-        val craftPlayer = player as CraftPlayer
-        val prop = craftPlayer.handle.profile.properties
-        setSkin(player, originalSkins.getOrDefault(player, Skin(prop.get("textures").firstOrNull()?.value, prop.get("textures").firstOrNull()?.signature)))
-        val entityPlayer = player.handle
-        val packet = entityPlayer.playerSpawnPacket()
-        entityPlayer.playerConnection.sendPacket(packet)
-        player.world.players.forEach {
-            if (it.uniqueId == player.uniqueId) return@forEach
-            (it as CraftPlayer).handle.playerConnection.sendPacket(packet)
-            it.handle.playerConnection.sendPacket(entityPlayer.playerSpawnPacket()) // hack because my code sucks :p
-        }
+        val skin = (player as CraftPlayer).handle.profile.properties["textures"].firstOrNull()?.let { Skin(it.value, it.signature) } ?: Skin(null, null)
+        data[player.uniqueId] = NickData(
+            skin,
+            player.name,
+            Component.text(""),
+            Component.text(""),
+            null,
+            UUID.randomUUID()
+        )
         prefixSuffix.values.forEach {
             player.handle.playerConnection.sendPacket(it)
         }
@@ -102,10 +105,13 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
 
     @EventHandler
     fun onQuit(e: PlayerQuitEvent) {
-        nicknames.remove(e.player)
-        currentSkins.remove(e.player)
-        originalSkins.remove(e.player)
-        getPrefixSuffixRemovePacket(e.player).let { packet ->
+        if (plugin.isEnabled) {
+            // to allow for info remove packet to be altered
+            Bukkit.getServer().scheduler.runTaskLater(plugin, {
+                data.remove(e.player.uniqueId)
+            }, 2L)
+        }
+        getPrefixSuffixPacket(e.player, remove = true).let { packet ->
             Bukkit.getOnlinePlayers().forEach {
                 (it as CraftPlayer).handle.playerConnection.sendPacket(packet)
             }
@@ -113,33 +119,17 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
         prefixSuffix.remove(e.player)
     }
 
-    private fun getPrefixSuffixRemovePacket(player: Player, prefix: TextComponent = Component.text(""), suffix: TextComponent = Component.text(""), textColor: ChatColor = ChatColor.WHITE): PacketPlayOutScoreboardTeam {
-        val packet = PacketPlayOutScoreboardTeam()
-        ReflectionHelper.setFieldValue("a", player.uniqueId.toString().replace('-', Character.MIN_VALUE).subSequence(0,16).toString(), packet) // team name
-        ReflectionHelper.setFieldValue("b", player.uniqueId.toString().replace('-', Character.MIN_VALUE).subSequence(0,16).toString(), packet) // team display name
-        ReflectionHelper.setFieldValue("c", LegacyComponentSerializer.legacySection().serialize(prefix), packet) // prefix
-        ReflectionHelper.setFieldValue("d", LegacyComponentSerializer.legacySection().serialize(suffix), packet) // suffix
-        ReflectionHelper.setFieldValue("e", EnumNameTagVisibility.ALWAYS.e, packet) // nametag visibility
-        ReflectionHelper.setFieldValue("f", EnumChatFormat.valueOf(textColor.name).b(), packet) // team color
-        ReflectionHelper.setFieldValue("g", mutableListOf(player.getNick()) as Collection<String>, packet) // players
-        ReflectionHelper.setFieldValue("h", 0, packet) // mode: 0 = add; 1 = remove; 2 = update; 3 = new players; 4 = players removed
-        ReflectionHelper.setFieldValue("i", 1, packet) // options: 1 = friendly fire; 2 = see friendly invisibles; 3 = both
-        return packet
-    }
 
-    private fun getPrefixSuffixAddPacket(player: Player, prefix: TextComponent = Component.text(""), suffix: TextComponent = Component.text(""), textColor: ChatColor = ChatColor.WHITE): PacketPlayOutScoreboardTeam {
+    private fun getPrefixSuffixPacket(player: Player, prefix: TextComponent = Component.text(""), suffix: TextComponent = Component.text(""), textColor: ChatColor = ChatColor.WHITE, remove: Boolean = false): PacketPlayOutScoreboardTeam {
         val packet = PacketPlayOutScoreboardTeam()
         ReflectionHelper.setFieldValue("a", player.uniqueId.toString().replace('-', Character.MIN_VALUE).subSequence(0,16).toString(), packet) // team name
         ReflectionHelper.setFieldValue("b", player.uniqueId.toString().replace('-', Character.MIN_VALUE).subSequence(0,16).toString(), packet) // team display name
         ReflectionHelper.setFieldValue("c", LegacyComponentSerializer.legacySection().serialize(prefix), packet) // prefix
-        player.sendMessage(LegacyComponentSerializer.legacySection().serialize(prefix))
         ReflectionHelper.setFieldValue("d", LegacyComponentSerializer.legacySection().serialize(suffix), packet) // suffix
-        player.sendMessage(LegacyComponentSerializer.legacySection().serialize(suffix))
         ReflectionHelper.setFieldValue("e", EnumNameTagVisibility.ALWAYS.e, packet) // nametag visibility
         ReflectionHelper.setFieldValue("f", EnumChatFormat.valueOf(textColor.name).b(), packet) // team color
-        println(EnumChatFormat.valueOf(textColor.name).b())
         ReflectionHelper.setFieldValue("g", mutableListOf(player.getNick()) as Collection<String>, packet) // players
-        ReflectionHelper.setFieldValue("h", 0, packet) // mode: 0 = add; 1 = remove; 2 = update; 3 = new players; 4 = players removed
+        ReflectionHelper.setFieldValue("h", if (remove) 1 else 0, packet) // mode: 0 = add; 1 = remove; 2 = update; 3 = new players; 4 = players removed
         ReflectionHelper.setFieldValue("i", 1, packet) // options: 1 = friendly fire; 2 = see friendly invisibles; 3 = both
 
         return packet
@@ -175,7 +165,8 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
             prefixSuffix[player]?.let { (other as CraftPlayer).handle.playerConnection.sendPacket(it) }
         }
         player.world.players.forEach {
-            (it as CraftPlayer).handle.playerConnection.sendPacket(addPacket)
+            (it as CraftPlayer).handle.playerConnection.sendPacket(entityPlayer.getSetMetadataPacket())
+            it.handle.playerConnection.sendPacket(addPacket)
             if (it.uniqueId == player.uniqueId) return@forEach
             it.handle.playerConnection.sendPacket(entityPlayer.playerSpawnPacket())
         }
@@ -204,7 +195,8 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
     }
 
     override fun setSkin(player: Player, skin: Skin): Boolean {
-        currentSkins[player] = skin
+        val data = data[player.uniqueId] ?: return false
+        data.currentSkin = skin
         val profile = (player as CraftPlayer).profile
         profile.properties.clear()
         profile.properties.put("textures", Property("textures", skin.value, skin.signature))
@@ -221,12 +213,19 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
         }
     }
 
-    override fun setNick(player: Player, nick: String) {
-        nicknames[player] = nick
+    override fun setSkinLayerVisible(player: Player, layer: SkinLayers.SkinLayer, visible: Boolean) {
+        data[player.uniqueId]?.skinLayers?.setLayerVisible(layer, visible)
+    }
+    override fun isSkinLayerVisible(player: Player, layer: SkinLayers.SkinLayer): Boolean {
+        return data[player.uniqueId]?.skinLayers?.isLayerVisible(layer) ?: true
     }
 
-    override fun resetNick(player: Player?) {
-        nicknames.remove(player)
+    override fun setNick(player: Player, nick: String) {
+        data[player.uniqueId]?.nickname = nick
+    }
+
+    override fun resetNick(player: Player) {
+        data[player.uniqueId]?.nickname = null
     }
 
     override fun setPrefixSuffix(player: Player, prefix: TextComponent, suffix: TextComponent, textColor: ChatColor) {
@@ -240,12 +239,25 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
             suf = Component.text(LegacyComponentSerializer.legacySection().serialize(prefix).substring(0, 12))
         }
 
-        val packet = getPrefixSuffixAddPacket(player, pre.append(reset), reset.append(suf), textColor)
+        val packet = getPrefixSuffixPacket(player, pre.append(reset), reset.append(suf), textColor, remove = false)
         prefixSuffix[player] = packet
     }
+
+    override fun updatePrefixSuffix(player: Player) {
+        Bukkit.getOnlinePlayers().forEach {
+            (it as CraftPlayer).handle.playerConnection.sendPacket(getPrefixSuffixPacket(player, remove = true))
+            it.handle.playerConnection.sendPacket(prefixSuffix[player])
+        }
+    }
+
     override fun resetDisguise(player: Player) {
         resetSkin(player)
         resetNick(player)
+        getPrefixSuffixPacket(player, remove = true).let { packet ->
+            Bukkit.getOnlinePlayers().forEach {
+                (it as CraftPlayer).handle.playerConnection.sendPacket(packet)
+            }
+        }
     }
 
     override fun onPacketSend(event: PacketSendEvent) {
@@ -263,19 +275,38 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
             if (event.player is Player && other.uniqueId == (event.player as Player).uniqueId) return
             wrapper.uuid = fakeId
         }
+        if (event.packetType == PacketType.Play.Server.ENTITY_METADATA) {
+            val wrapper = WrapperPlayServerEntityMetadata(event)
+            var other: Player? = null
+            Bukkit.getOnlinePlayers().forEach { if (it.entityId == wrapper.entityId) other = it }
+            if (other == null) return
+            wrapper.entityMetadata.forEach {
+                if (it.index == 10) it.value = data[other!!.uniqueId]?.skinLayers?.rawSkinLayers ?: it.value
+            }
+        }
+    }
+
+    override fun onPacketReceive(event: PacketReceiveEvent) {
+        if (event.player !is Player) return
+        val player = event.player as Player
+        if (event.packetType == PacketType.Play.Client.CLIENT_SETTINGS) {
+            val packet = WrapperPlayClientSettings(event)
+            if (data[player.uniqueId]?.skinLayers == null) {
+                data[player.uniqueId]?.skinLayers = SkinLayers.getFromRaw(packet.visibleSkinSectionMask)
+            }
+        }
     }
     
     private fun changeProfile(profile: UserProfile, hideUUID: Boolean = true) {
         val uuid = profile.uuid
+        val data = data[uuid] ?: return
         val other = Bukkit.getOfflinePlayer(uuid)
         if (!other.isOnline) return
         if (other !is Player) return
         val id = getFakeUUID(other)
-        profile.name = nicknames.getOrDefault(other.player, other.name)
+        profile.name = data.nickname ?: other.name
         if (hideUUID) profile.uuid = id // fake uuid
-        var skin = currentSkins[other]
-        if (skin == null) skin = originalSkins[other]
-        if (skin == null) return
+        val skin = data.currentSkin ?: data.originalSkin ?: Skin(null, null)
         profile.textureProperties = listOf(TextureProperty("textures", skin.value, skin.signature))
     }
 

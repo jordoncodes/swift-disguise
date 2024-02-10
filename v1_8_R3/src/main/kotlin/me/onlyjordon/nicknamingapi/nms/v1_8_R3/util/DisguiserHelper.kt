@@ -53,6 +53,11 @@ class DisguiserHelper {
             return this
         }
 
+        fun EntityPlayer.getSetMetadataPacket(): PacketPlayOutEntityMetadata {
+            return PacketPlayOutEntityMetadata(id, dataWatcher, true)
+        }
+
+
         val EntityPlayer.worldServer: WorldServer
             get() = this.u()
 
