@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.onlyjordon</groupId>
-    <artifactId>nicknaming-api</artifactId>
-    <version>1.0.0</version>
+    <artifactId>nicknamer-api</artifactId>
+    <version>v1.0.0</version>
     <packaging>jar</packaging>
 
     <name>Nicknamer-API</name>
@@ -33,7 +33,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>Nicknaming-API</finalName>
+                    <finalName>Nicknamer-API-${version}</finalName>
                     <outputDirectory>${project.basedir}/../servers/${miencraft.version}/plugins</outputDirectory>
                 </configuration>
             </plugin>
