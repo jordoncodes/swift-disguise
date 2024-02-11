@@ -3,14 +3,12 @@ package me.onlyjordon.nicknamingapi.commands;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.SimpleCommandMap;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@ApiStatus.Internal
 public class SimpleCommandManager implements CommandManager {
     public List<Command> commands = null;
     private String prefix = "core";

@@ -2,11 +2,9 @@ package me.onlyjordon.nicknamingapi.commands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 
-@ApiStatus.Internal
 public abstract class SimpleCommand extends Command {
 
     public SimpleCommand(String name) {

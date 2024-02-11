@@ -1,6 +1,5 @@
 
-import me.onlyjordon.nicknamingapi.Nicknamer
-import me.onlyjordon.nicknamingapi.utils.Skin
+import me.onlyjordon.nicknamingapi.NicknamerAPI
 import me.onlyjordon.nicknamingapi.utils.SkinLayers.SkinLayer
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.ChatColor
@@ -9,47 +8,47 @@ import org.bukkit.entity.Player
 class PlayerExtensions {
     companion object {
         fun Player.getNick(): String {
-            return Nicknamer.getDisguiser().getNick(this)
+            return NicknamerAPI.getNicknamer().getNick(this)
         }
 
         fun Player.setNick(nick: String) {
-            Nicknamer.getDisguiser().setNick(this, nick)
+            NicknamerAPI.getNicknamer().setNick(this, nick)
         }
 
-        fun Player.getSkin(): Skin {
-            return Nicknamer.getDisguiser().getSkin(this)
+        fun Player.getSkin(): me.onlyjordon.nicknamingapi.utils.Skin {
+            return NicknamerAPI.getNicknamer().getSkin(this)
         }
 
-        fun Player.setSkin(skin: Skin) {
-            Nicknamer.getDisguiser().setSkin(this, skin)
+        fun Player.setSkin(skin: me.onlyjordon.nicknamingapi.utils.Skin) {
+            NicknamerAPI.getNicknamer().setSkin(this, skin)
         }
 
         fun Player.setSkin(skin: String) {
-            Nicknamer.getDisguiser().setSkin(this, skin)
+            NicknamerAPI.getNicknamer().setSkin(this, skin)
         }
 
         fun Player.refresh() {
-            Nicknamer.getDisguiser().refreshPlayer(this)
+            NicknamerAPI.getNicknamer().refreshPlayer(this)
         }
 
         fun Player.setPrefixSuffix(prefix: TextComponent, suffix: TextComponent, textColor: ChatColor, priority: Int) {
-            Nicknamer.getDisguiser().setPrefixSuffix(this, prefix, suffix, textColor, priority)
+            NicknamerAPI.getNicknamer().setPrefixSuffix(this, prefix, suffix, textColor, priority)
         }
 
         fun Player.setSkinLayerVisible(layer: SkinLayer, visible: Boolean) {
-            Nicknamer.getDisguiser().setSkinLayerVisible(this, layer, visible)
+            NicknamerAPI.getNicknamer().setSkinLayerVisible(this, layer, visible)
         }
 
         fun Player.isSkinLayerVisible(layer: SkinLayer): Boolean {
-            return Nicknamer.getDisguiser().isSkinLayerVisible(this, layer)
+            return NicknamerAPI.getNicknamer().isSkinLayerVisible(this, layer)
         }
 
         fun Player.hide(layer: SkinLayer) {
-            Nicknamer.getDisguiser().hide(this, layer)
+            NicknamerAPI.getNicknamer().hide(this, layer)
         }
 
         fun Player.show(layer: SkinLayer) {
-            Nicknamer.getDisguiser().show(this, layer)
+            NicknamerAPI.getNicknamer().show(this, layer)
         }
     }
 }

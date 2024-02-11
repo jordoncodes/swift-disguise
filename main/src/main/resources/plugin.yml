@@ -1,6 +1,6 @@
 name: nicknamer-api
-version: '${project.version}'
-main: me.onlyjordon.nicknamingapi.Nicknamer
+version: '1.1.0'
+main: me.onlyjordon.nicknamingapi.NicknamerAPI
 load: STARTUP
 depend:
   - packetevents

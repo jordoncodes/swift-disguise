@@ -8,6 +8,7 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftServer
 import org.jetbrains.annotations.ApiStatus
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
+
 @ApiStatus.Internal
 object DisguiserHelper {
 

@@ -7,13 +7,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.permissions.Permission;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@ApiStatus.Internal
 public abstract class Command extends org.bukkit.command.Command implements CommandExecutor, TabCompleter {
 
     private final transient Map<String, String> usageStrings;
@@ -24,7 +22,7 @@ public abstract class Command extends org.bukkit.command.Command implements Comm
     }
 
     protected Command(String name, String permission) {
-        this(name, permission, new ArrayList<String>());
+        this(name, permission, new ArrayList<>());
     }
 
     protected Command(String name, Permission permission) {
@@ -53,7 +51,7 @@ public abstract class Command extends org.bukkit.command.Command implements Comm
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        this.usageStrings = new LinkedHashMap<String, String>();
+        this.usageStrings = new LinkedHashMap<>();
     }
 
     protected Command(String name, String permission, String[] aliases) {
@@ -114,7 +112,7 @@ public abstract class Command extends org.bukkit.command.Command implements Comm
         HashMap<String, Integer> allTabs = completeTab(sender, alias, args);
         if (allTabs == null) return null;
         if (allTabs.isEmpty()) return new ArrayList<>();
-        List<String> currentTabs = new ArrayList<String>();
+        List<String> currentTabs = new ArrayList<>();
         allTabs.keySet().forEach((tab) -> {
             int arg = allTabs.get(tab);
 

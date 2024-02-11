@@ -5,17 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.onlyjordon</groupId>
-    <artifactId>nicknamer-api</artifactId>
+    <artifactId>nicknamer-api-dev</artifactId>
     <version>v1.1.0</version>
     <packaging>jar</packaging>
 
-    <name>Nicknamer-API</name>
+    <name>nicknamer-api-dev</name>
 
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.9.22</kotlin.version>
-        <minecraft.version>1.20.4</minecraft.version> <!-- make it your testing server's version -->
+        <miencraft.version>1.20.1</miencraft.version> <!-- make it your testing server's version -->
     </properties>
 
     <build>
@@ -34,7 +34,7 @@
                 </executions>
                 <configuration>
                     <finalName>Nicknamer-API-${project.version}</finalName>
-                    <outputDirectory>${project.basedir}/../servers/${minecraft.version}/plugins</outputDirectory>
+                    <outputDirectory>${project.basedir}/../servers/${miencraft.version}/plugins</outputDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -65,7 +65,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <jvmTarget>8</jvmTarget>
+                    <jvmTarget>1.8</jvmTarget>
                 </configuration>
             </plugin>
             <plugin>
@@ -134,31 +134,7 @@
             <groupId>me.onlyjordon</groupId>
             <artifactId>nicknamer-api-main</artifactId>
             <version>v1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-implementation-v1_8_R3</artifactId>
-            <version>v1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-implementation-v1_20_R3</artifactId>
-            <version>v1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-implementation-v1_20_R1</artifactId>
-            <version>v1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-dev</artifactId>
-            <version>v1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-nms-common</artifactId>
-            <version>v1.1.0</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

@@ -24,7 +24,7 @@ Include the dependency in a maven project:
     <dependency>
         <groupId>com.github.jordoncodes</groupId>
         <artifactId>nicknamer-api</artifactId>
-        <version>v1.0.2</version>
+        <version>v1.1.0</version>
         <scope>provided</scope> <!-- without this, Nicknamer.getDisguiser() will give you null -->
     </dependency>
 </dependencies>
@@ -33,7 +33,7 @@ Include the dependency in a maven project:
 After that you can simply:
 ```java 
 // get the api
-NMSDisguiser disguiser = Nicknamer.getDisguiser();
+Nicknamer disguiser = NicknamerAPI.getNicknamer();
 
 // then call:
 disguiser.setNick(player, "nickname");
@@ -57,6 +57,6 @@ You could also use Nicknamer-API to set prefixes and suffixes for players. This 
 // set the prefix/suffix values:
 disguiser.setPrefixSuffix(player, Component.text(ChatColor.RED+"Prefix"), Component.text(ChatColor.GREEN+"Suffix"), ChatColor.WHITE, 0); // last param (int) is a priority in the tablist, higher priority = lower position in tablist.
 // apply the change:
-Nicknamer.getDisguiser().updatePrefixSuffix(player);
+disguiser.updatePrefixSuffix(player);
 ```
 This would make the name of the player in the tablist and above their head "Prefix {player's nickname} Suffix". This uses [Adventure](https://docs.advntr.dev/index.html).

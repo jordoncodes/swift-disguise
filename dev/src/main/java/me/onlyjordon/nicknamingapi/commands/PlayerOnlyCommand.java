@@ -3,12 +3,10 @@ package me.onlyjordon.nicknamingapi.commands;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
 import java.util.List;
 
-@ApiStatus.Internal
 public abstract class PlayerOnlyCommand extends Command {
 
     public PlayerOnlyCommand(String name) {

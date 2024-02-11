@@ -6,7 +6,7 @@
 
     <groupId>me.onlyjordon</groupId>
     <artifactId>nicknamer-api-implementation-v1_20_R3</artifactId>
-    <version>v1.0.2</version>
+    <version>v1.1.0</version>
     <packaging>jar</packaging>
 
     <name>nicknamer-api-implementation-v1_20_R3</name>
@@ -192,8 +192,13 @@
         <dependency>
             <groupId>me.onlyjordon</groupId>
             <artifactId>nicknamer-api-main</artifactId>
-            <version>v1.0.2</version>
+            <version>v1.1.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.onlyjordon</groupId>
+            <artifactId>nicknamer-api-nms-common</artifactId>
+            <version>v1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.retrooper.packetevents</groupId>

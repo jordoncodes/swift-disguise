@@ -6,7 +6,7 @@
 
     <groupId>me.onlyjordon</groupId>
     <artifactId>nicknamer-api-maven</artifactId>
-    <version>v1.0.2</version>
+    <version>v1.1.0</version>
     <packaging>pom</packaging>
 
     <name>nicknamer-api</name>
@@ -130,8 +130,10 @@
     </dependencies>
 
     <modules>
+        <module>dev</module>
         <module>build</module>
         <module>main</module>
+        <module>nms-common</module>
         <module>v1_20_R3</module>
         <module>v1_20_R1</module>
         <module>v1_8_R3</module>
