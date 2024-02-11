@@ -23,7 +23,7 @@ Include the dependency in a maven project:
     <!-- other dependencies -->
     <dependency>
         <groupId>com.github.jordoncodes</groupId>
-        <artifactId>nicknamer-api</artifactId>
+        <artifactId>nicknamer-api-main</artifactId>
         <version>v1.0.2</version>
         <scope>provided</scope> <!-- without this, Nicknamer.getDisguiser() will give you null -->
     </dependency>
