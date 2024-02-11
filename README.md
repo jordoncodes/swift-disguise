@@ -1,6 +1,8 @@
 # Nicknamer-API
 This is a simple API that allows you to nickname a player. It currently supports Spigot 1.8.8 and 1.20.4 and paper for both versions. For 1.8 users, I would recommend using a fork like [PandaSpigot](https://github.com/hpfxd/PandaSpigot).
-
+Used in: 
+- [CapeHider (plugin)](https://github.com/jordoncodes/CapeHider)
+- [1hour1life (server)](https://discord.gg/qcUDTArQC7)
 ## Features:
 The main features of this API are: changing a player's name, changing a player's skin, giving the player a prefix/suffix using a scoreboard team packet. If you want a new version, feel free to make an issue!
 
@@ -60,3 +62,5 @@ disguiser.setPrefixSuffix(player, Component.text(ChatColor.RED+"Prefix"), Compon
 disguiser.updatePrefixSuffix(player);
 ```
 This would make the name of the player in the tablist and above their head "Prefix {player's nickname} Suffix". This uses [Adventure](https://docs.advntr.dev/index.html).
+
+Example plugin you can make yours from: [CapeHider](https://github.com/jordoncodes/CapeHider)
