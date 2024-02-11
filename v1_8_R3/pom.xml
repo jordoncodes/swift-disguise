@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.onlyjordon</groupId>
-    <artifactId>v1_8_R3</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>nicknamer-api-implementation-v1_8_R3</artifactId>
+    <version>v1.0.2</version>
     <packaging>jar</packaging>
 
-    <name>v1_8_R3</name>
+    <name>nicknamer-api-implementation-v1_8_R3</name>
 
     <properties>
         <java.version>1.8</java.version>
@@ -129,8 +129,8 @@
         </dependency>
         <dependency>
             <groupId>me.onlyjordon</groupId>
-            <artifactId>main</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <artifactId>nicknamer-api-main</artifactId>
+            <version>v1.0.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

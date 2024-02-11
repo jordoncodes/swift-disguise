@@ -6,7 +6,7 @@
 
     <groupId>me.onlyjordon</groupId>
     <artifactId>nicknamer-api</artifactId>
-    <version>v1.0.0</version>
+    <version>v1.0.2</version>
     <packaging>jar</packaging>
 
     <name>Nicknamer-API</name>
@@ -124,65 +124,21 @@
             <url>https://repo.codemc.io/repository/maven-releases/</url>
         </repository>
     </repositories>
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <dependencies>
-                <dependency>
-                    <groupId>me.onlyjordon</groupId>
-                    <artifactId>main</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                    <groupId>me.onlyjordon</groupId>
-                    <artifactId>v1_20_R3</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>small</id> <!-- 1.8.8 and latest -->
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>me.onlyjordon</groupId>
-                    <artifactId>main</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                    <groupId>me.onlyjordon</groupId>
-                    <artifactId>v1_8_R3</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                    <groupId>me.onlyjordon</groupId>
-                    <artifactId>v1_20_R3</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>full</id> <!--all versions -->
-            <dependencies>
-                <dependency>
-                    <groupId>me.onlyjordon</groupId>
-                    <artifactId>main</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                    <groupId>me.onlyjordon</groupId>
-                    <artifactId>v1_8_R3</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                    <groupId>me.onlyjordon</groupId>
-                    <artifactId>v1_20_R3</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
+    <dependencies>
+        <dependency>
+            <groupId>me.onlyjordon</groupId>
+            <artifactId>nicknamer-api-main</artifactId>
+            <version>v1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>me.onlyjordon</groupId>
+            <artifactId>nicknamer-api-implementation-v1_8_R3</artifactId>
+            <version>v1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>me.onlyjordon</groupId>
+            <artifactId>nicknamer-api-implementation-v1_20_R3</artifactId>
+            <version>v1.0.2</version>
+        </dependency>
+    </dependencies>
 </project>

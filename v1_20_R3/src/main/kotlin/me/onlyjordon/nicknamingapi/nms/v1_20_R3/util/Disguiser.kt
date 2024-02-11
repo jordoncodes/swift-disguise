@@ -34,6 +34,7 @@ import org.bukkit.craftbukkit.v1_20_R3.CraftServer
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerChangedWorldEvent
 import org.bukkit.event.player.PlayerJoinEvent
@@ -153,7 +154,7 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
         profile.textureProperties = listOf(TextureProperty("textures", skin.value, skin.signature))
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
         val metadata = (player as CraftPlayer).handle.entityData
@@ -175,7 +176,7 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     fun onQuit(e: PlayerQuitEvent) {
         val player = e.player
         val plugin = JavaPlugin.getProvidingPlugin(this.javaClass)
@@ -203,13 +204,13 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
     }
 
     override fun refreshPlayer(player: Player) {
-        player.location.world.players.forEach {
+        player.location.world?.players?.forEach {
             if (it != player) {
                 it.hidePlayer(player)
             }
         }
         if (!player.isOnline) return
-        for (other in player.location.world.players) {
+        for (other in player.location.world?.players ?: emptyList()) {
             val otherNMSEntity = (other as CraftPlayer).handle
             otherNMSEntity.sendPlayerInfoRemovePacket(player)
             otherNMSEntity.sendPlayerInfoUpdatePacket(player, Action.ADD_PLAYER)
@@ -217,7 +218,7 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
             otherNMSEntity.sendSetEntityMetadataPacket(player)
             prefixSuffix[player]?.let { other.handle.connection.send(it) }
         }
-        player.location.world.players.forEach {
+        player.location.world?.players?.forEach {
             if (it != player) {
                 it.showPlayer(player)
             }
@@ -251,6 +252,10 @@ class Disguiser: Listener,PacketListener,NMSDisguiser() {
 
     override fun isSkinLayerVisible(player: Player, layer: SkinLayers.SkinLayer): Boolean {
         return data[player.uniqueId]?.skinLayers?.isLayerVisible(layer) ?: true
+    }
+
+    override fun getSkinLayers(player: Player): SkinLayers {
+        return data[player.uniqueId]?.skinLayers ?: SkinLayers.getFromRaw(0b0111111)
     }
 
     override fun setNick(player: Player, nick: String) {

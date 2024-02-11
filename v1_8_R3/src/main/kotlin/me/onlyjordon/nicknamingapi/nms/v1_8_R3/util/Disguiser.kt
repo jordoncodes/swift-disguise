@@ -40,6 +40,7 @@ import org.bukkit.World
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerChangedWorldEvent
 import org.bukkit.event.player.PlayerJoinEvent
@@ -87,7 +88,7 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
         val skin = (player as CraftPlayer).handle.profile.properties["textures"].firstOrNull()?.let { Skin(it.value, it.signature) } ?: Skin(null, null)
@@ -104,7 +105,7 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     fun onQuit(e: PlayerQuitEvent) {
         if (plugin.isEnabled) {
             // to allow for info remove packet to be altered
@@ -136,7 +137,7 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
         return packet
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     fun onWorldChange(e: PlayerChangedWorldEvent) {
         refreshPlayer(e.player)
     }
@@ -219,6 +220,10 @@ class Disguiser : PacketListener,Listener, NMSDisguiser() {
     }
     override fun isSkinLayerVisible(player: Player, layer: SkinLayers.SkinLayer): Boolean {
         return data[player.uniqueId]?.skinLayers?.isLayerVisible(layer) ?: true
+    }
+
+    override fun getSkinLayers(player: Player): SkinLayers {
+        return data[player.uniqueId]?.skinLayers ?: SkinLayers.getFromRaw(0b0111111)
     }
 
     override fun setNick(player: Player, nick: String) {

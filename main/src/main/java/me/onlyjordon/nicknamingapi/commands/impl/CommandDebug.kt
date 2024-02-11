@@ -1,6 +1,5 @@
 package me.onlyjordon.nicknamingapi.commands.impl
 
-import PlayerExtensions.Companion.setSkinLayerVisible
 import me.onlyjordon.nicknamingapi.Nicknamer
 import me.onlyjordon.nicknamingapi.commands.PlayerOnlyCommand
 import me.onlyjordon.nicknamingapi.utils.SkinLayers
@@ -9,6 +8,7 @@ import net.kyori.adventure.text.format.TextColor
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.jetbrains.annotations.ApiStatus.Internal
+import java.util.concurrent.ThreadLocalRandom
 
 @Internal
 class CommandDebug : PlayerOnlyCommand("debug", "debug.use") {
@@ -47,10 +47,10 @@ class CommandDebug : PlayerOnlyCommand("debug", "debug.use") {
                 return true
             }
             if ("skinlayers".equals(args[0], ignoreCase = true)) {
-                player.sendMessage("Setting skin layers to 0...")
-                SkinLayers.SkinLayer.entries.forEach {
-                    player.setSkinLayerVisible(it, false)
-                }
+                player.sendMessage("Setting random skin layers to 0...")
+                println(Nicknamer.getDisguiser().getSkinLayers(player).rawSkinLayers)
+                Nicknamer.getDisguiser().setSkinLayerVisible(player, SkinLayers.SkinLayer.entries[ThreadLocalRandom.current().nextInt(SkinLayers.SkinLayer.entries.size)], false)
+                println(Nicknamer.getDisguiser().getSkinLayers(player).rawSkinLayers)
                 player.sendMessage("Skin layers set!")
                 return true
             }

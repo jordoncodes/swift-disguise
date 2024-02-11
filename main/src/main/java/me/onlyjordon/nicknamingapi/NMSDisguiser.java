@@ -9,6 +9,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -83,6 +84,12 @@ public abstract class NMSDisguiser {
      * @return whether the layer is visible or not
      */
     public abstract boolean isSkinLayerVisible(@NotNull Player player, @NotNull SkinLayers.SkinLayer layer);
+
+    public abstract SkinLayers getSkinLayers(@NotNull Player player);
+
+    public EnumSet<SkinLayers.SkinLayer> getVisibleSkinLayers(@NotNull Player player) {
+        return getSkinLayers(player).getVisibleLayers();
+    }
 
     /**
      * Sets the nickname of a player

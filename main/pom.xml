@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.onlyjordon</groupId>
-    <artifactId>main</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>nicknamer-api-main</artifactId>
+    <version>v1.0.2</version>
     <packaging>jar</packaging>
 
-    <name>main</name>
+    <name>nicknamer-api-main</name>
 
     <properties>
         <java.version>1.8</java.version>
