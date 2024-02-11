@@ -33,7 +33,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>Nicknamer-API-${version}</finalName>
+                    <finalName>Nicknamer-API-${project.version}</finalName>
                     <outputDirectory>${project.basedir}/../servers/${miencraft.version}/plugins</outputDirectory>
                 </configuration>
             </plugin>
