@@ -198,7 +198,8 @@ class Disguiser: Listener,PacketListener, Nicknamer() {
         if (plugin.isEnabled) {
             // to allow for info remove packet to be altered
             Bukkit.getServer().scheduler.runTaskLater(plugin, Runnable {
-                data.remove(player.uniqueId)
+                if (!player.isOnline)
+                    data.remove(player.uniqueId)
             }, 2L)
         }
         Bukkit.getOnlinePlayers().forEach {

@@ -116,7 +116,8 @@ class Disguiser : PacketListener,Listener, Nicknamer() {
         if (plugin.isEnabled) {
             // to allow for info remove packet to be altered
             Bukkit.getServer().scheduler.runTaskLater(plugin, {
-                data.remove(e.player.uniqueId)
+                if (!e.player.isOnline)
+                    data.remove(e.player.uniqueId)
             }, 2L)
         }
         getPrefixSuffixPacket(e.player, remove = true).let { packet ->

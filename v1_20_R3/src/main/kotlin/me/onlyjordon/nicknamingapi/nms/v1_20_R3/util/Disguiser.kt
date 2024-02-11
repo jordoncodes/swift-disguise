@@ -14,8 +14,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity
 import com.mojang.authlib.properties.Property
 import io.netty.buffer.Unpooled
-import me.onlyjordon.nicknamingapi.Nicknamer
 import me.onlyjordon.nicknamingapi.NickData
+import me.onlyjordon.nicknamingapi.Nicknamer
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer
 import net.minecraft.ChatFormatting
@@ -192,7 +192,8 @@ class Disguiser: Listener,PacketListener, Nicknamer() {
         if (plugin.isEnabled) {
             // to allow for info remove packet to be altered
             Bukkit.getServer().scheduler.runTaskLater(plugin, Runnable {
-                data.remove(player.uniqueId)
+                if (!player.isOnline)
+                    data.remove(player.uniqueId)
             }, 2L)
         }
         Bukkit.getOnlinePlayers().forEach {
