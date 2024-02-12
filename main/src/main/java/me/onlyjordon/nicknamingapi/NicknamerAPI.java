@@ -31,6 +31,14 @@ public final class NicknamerAPI extends JavaPlugin {
     @Override
     @SuppressWarnings("unchecked")
     public void onLoad() {
+        setNicknamer();
+        String env = System.getenv("NICKNAMER_DEV");
+        if (env != null)
+            isDev = env.equalsIgnoreCase("true");
+    }
+
+
+    private void setNicknamer() {
         String verAndRev = NMSUtils.getMinecraftPackage();
         try {
             Class<? extends Nicknamer> disguiserClass = (Class<? extends Nicknamer>) Class.forName("me.onlyjordon.nicknamingapi.nms." + verAndRev + ".util.Disguiser");
@@ -39,11 +47,6 @@ public final class NicknamerAPI extends JavaPlugin {
                  IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("Failed to load - Try updating the plugin or your server!", e);
         }
-
-        String env = System.getenv("NICKNAMER_DEV");
-        if (env != null)
-            isDev = env.equalsIgnoreCase("true");
-
     }
 
     @Override
@@ -59,6 +62,9 @@ public final class NicknamerAPI extends JavaPlugin {
     }
 
     public static Nicknamer getNicknamer() {
+        if (disguiser == null) {
+            throw new NullPointerException("Null Nicknamer! NicknamerAPI hasn't loaded, check https://github.com/jordoncodes/nicknamer-api?tab=readme-ov-file#null-nicknamer on how to fix.");
+        }
         return disguiser;
     }
 }

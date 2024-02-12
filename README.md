@@ -64,3 +64,10 @@ disguiser.updatePrefixSuffix(player);
 This would make the name of the player in the tablist and above their head "Prefix {player's nickname} Suffix". This uses [Adventure](https://docs.advntr.dev/index.html).
 
 Example plugin you can make yours from: [CapeHider](https://github.com/jordoncodes/CapeHider)
+
+# Errors
+## Null Nicknamer
+I'm getting a null nicknamer error? What do I do?
+
+You probably have Nicknamer API in your jar. Try following [this](https://github.com/jordoncodes/nicknamer-api?tab=readme-ov-file#maven)
+

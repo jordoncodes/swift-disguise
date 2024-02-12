@@ -17,6 +17,11 @@ public abstract class Nicknamer {
 
     protected HashMap<UUID, NickData> data = new HashMap<>();
 
+    @Nullable
+    public INickData getData(Player player) {
+        return data.get(player.getUniqueId());
+    }
+
     /**
      * Refreshes the player, updating their skin, nickname, prefix & suffix
      * @param player the player to refresh

@@ -6,7 +6,7 @@ import net.kyori.adventure.text.TextComponent;
 
 import java.util.UUID;
 
-public class NickData {
+public class NickData implements INickData {
     private Skin originalSkin;
     private Skin currentSkin;
     private String nickname;
@@ -25,30 +25,37 @@ public class NickData {
         this.currentSkin = null;
     }
 
+    @Override
     public Skin getCurrentSkin() {
         return currentSkin;
     }
 
+    @Override
     public Skin getOriginalSkin() {
         return originalSkin;
     }
 
+    @Override
     public SkinLayers getSkinLayers() {
         return skinLayers;
     }
 
+    @Override
     public String getNickname() {
         return nickname;
     }
 
+    @Override
     public TextComponent getPrefix() {
         return prefix;
     }
 
+    @Override
     public TextComponent getSuffix() {
         return suffix;
     }
 
+    @Override
     public UUID getFakeUUID() {
         return fakeUUID;
     }
