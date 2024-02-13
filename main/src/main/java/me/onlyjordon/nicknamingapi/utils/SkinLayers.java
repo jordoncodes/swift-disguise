@@ -85,6 +85,32 @@ public class SkinLayers {
         return visibleLayers.contains(layer);
     }
 
+    @Override
+    public String toString() {
+        return "SkinLayers{" +
+                "visibleLayers=" + visibleLayers +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SkinLayers)) return false;
+
+        SkinLayers that = (SkinLayers) o;
+
+        return visibleLayers.equals(that.visibleLayers);
+    }
+
+    @Override
+    public int hashCode() {
+        return visibleLayers.hashCode();
+    }
+
+    public SkinLayers copy() {
+        return getFromRaw(getRawSkinLayers());
+    }
+
     public enum SkinLayer {
         CAPE((byte) 0b00000001),
         JACKET((byte) 0b00000010),
@@ -112,4 +138,5 @@ public class SkinLayers {
             }
         }
     }
+
 }

@@ -16,8 +16,10 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnPlayer
 import com.mojang.authlib.properties.Property
 import io.netty.buffer.Unpooled
+import me.onlyjordon.nicknamingapi.INicknamer
 import me.onlyjordon.nicknamingapi.NickData
-import me.onlyjordon.nicknamingapi.Nicknamer
+import me.onlyjordon.nicknamingapi.events.PlayerSkinLayerChangeEvent
+import me.onlyjordon.nicknamingapi.utils.SkinLayers
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer
 import net.minecraft.ChatFormatting
@@ -45,7 +47,7 @@ import java.lang.reflect.Constructor
 import java.util.*
 
 @Internal
-class Disguiser: Listener,PacketListener, Nicknamer() {
+class Disguiser: Listener,PacketListener, INicknamer() {
     private val prefixSuffix = WeakHashMap<Player, ClientboundSetPlayerTeamPacket>()
 
     private var setPlayerTeamPacketConstructor: Constructor<ClientboundSetPlayerTeamPacket>? = null
@@ -148,9 +150,14 @@ class Disguiser: Listener,PacketListener, Nicknamer() {
         val player = event.player as Player
         if (event.packetType == PacketType.Play.Client.CLIENT_SETTINGS) {
             val packet = WrapperPlayClientSettings(event)
-            if (data[player.uniqueId]?.skinLayers == null) {
-                data[player.uniqueId]?.skinLayers = me.onlyjordon.nicknamingapi.utils.SkinLayers.getFromRaw(packet.visibleSkinSectionMask)
+            val e = PlayerSkinLayerChangeEvent(player, data[player.uniqueId]?.skinLayers, SkinLayers.getFromRaw(packet.visibleSkinSectionMask))
+            Bukkit.getPluginManager().callEvent(e)
+            if (e.isCancelled) {
+                packet.visibleSkinSectionMask = data[player.uniqueId]?.skinLayers?.rawSkinLayers ?: 0b0000000
+            } else {
+                packet.visibleSkinSectionMask = e.newLayers?.rawSkinLayers ?: 0b0000000
             }
+            data[player.uniqueId]?.skinLayers = SkinLayers.getFromRaw(packet.visibleSkinSectionMask)
         }
     }
 
@@ -256,8 +263,8 @@ class Disguiser: Listener,PacketListener, Nicknamer() {
         return true
     }
 
-    override fun setSkin(player: Player, name: String) {
-        setSkin(player, me.onlyjordon.nicknamingapi.utils.Skin.getSkin(name))
+    override fun setSkinLayers(player: Player, layers: SkinLayers) {
+        data[player.uniqueId]?.skinLayers = layers
     }
 
     override fun setSkinLayerVisible(player: Player, layer: me.onlyjordon.nicknamingapi.utils.SkinLayers.SkinLayer, visible: Boolean) {
@@ -271,7 +278,7 @@ class Disguiser: Listener,PacketListener, Nicknamer() {
     }
 
     override fun getSkinLayers(player: Player): me.onlyjordon.nicknamingapi.utils.SkinLayers {
-        return data[player.uniqueId]?.skinLayers ?: me.onlyjordon.nicknamingapi.utils.SkinLayers.getFromRaw(0b0111111)
+        return data[player.uniqueId]?.skinLayers ?: SkinLayers.getFromRaw(0b0111111)
     }
 
     override fun setNick(player: Player, nick: String) {
@@ -315,6 +322,16 @@ class Disguiser: Listener,PacketListener, Nicknamer() {
     override fun setPrefixSuffix(player: Player, prefix: TextComponent, suffix: TextComponent, textColor: ChatColor, priority: Int) {
         setFields()
         prefixSuffix[player] = getTeamPacket(player, prefix, suffix, textColor, 0, priority)
+        data[player.uniqueId]?.prefix = prefix
+        data[player.uniqueId]?.suffix = suffix
+    }
+
+    override fun getPrefix(player: Player?): TextComponent {
+        return data[player?.uniqueId]?.prefix ?: net.kyori.adventure.text.Component.text("")
+    }
+
+    override fun getSuffix(player: Player?): TextComponent {
+        return data[player?.uniqueId]?.suffix ?: net.kyori.adventure.text.Component.text("")
     }
 
     override fun updatePrefixSuffix(player: Player) {

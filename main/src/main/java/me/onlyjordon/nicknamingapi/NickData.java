@@ -30,6 +30,10 @@ public class NickData implements INickData {
         return currentSkin;
     }
 
+    public void setCurrentSkin(Skin currentSkin) {
+        this.currentSkin = currentSkin;
+    }
+
     @Override
     public Skin getOriginalSkin() {
         return originalSkin;
@@ -58,10 +62,6 @@ public class NickData implements INickData {
     @Override
     public UUID getFakeUUID() {
         return fakeUUID;
-    }
-
-    public void setCurrentSkin(Skin currentSkin) {
-        this.currentSkin = currentSkin;
     }
 
     public void setFakeUUID(UUID fakeUUID) {

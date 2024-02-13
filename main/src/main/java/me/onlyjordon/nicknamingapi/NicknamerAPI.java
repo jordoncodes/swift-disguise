@@ -7,19 +7,20 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.InvocationTargetException;
 
-public final class NicknamerAPI extends JavaPlugin {
+public final class NicknamerAPI extends JavaPlugin implements Listener {
     private static Nicknamer disguiser;
     private static boolean isDev = false;
     private Object dev;
 
     @Override
     public void onEnable() {
-        if (disguiser instanceof Listener) {
-            getServer().getPluginManager().registerEvents((Listener) disguiser, NicknamerAPI.this);
+        if (disguiser.getImplementation() instanceof Listener) {
+            getServer().getPluginManager().registerEvents((Listener) disguiser.getImplementation(), this);
         }
+
         if (isDev) {
             try {
-                dev = Class.forName("me.onlyjordon.nicknamingapi.Dev").getConstructor().newInstance();
+                dev = Class.forName("me.onlyjordon.nicknamingapi.Dev").getConstructor(JavaPlugin.class).newInstance(this);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                      NoSuchMethodException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
@@ -41,8 +42,9 @@ public final class NicknamerAPI extends JavaPlugin {
     private void setNicknamer() {
         String verAndRev = NMSUtils.getMinecraftPackage();
         try {
-            Class<? extends Nicknamer> disguiserClass = (Class<? extends Nicknamer>) Class.forName("me.onlyjordon.nicknamingapi.nms." + verAndRev + ".util.Disguiser");
-            NicknamerAPI.disguiser = disguiserClass.getConstructor().newInstance();
+            Class<? extends INicknamer> disguiserClass = (Class<? extends INicknamer>) Class.forName("me.onlyjordon.nicknamingapi.nms." + verAndRev + ".util.Disguiser");
+            INicknamer nicknamer = disguiserClass.getConstructor().newInstance();
+            disguiser = new Nicknamer(nicknamer, this);
         } catch (NoSuchMethodException | ClassNotFoundException | ClassCastException | InstantiationException |
                  IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("Failed to load - Try updating the plugin or your server!", e);

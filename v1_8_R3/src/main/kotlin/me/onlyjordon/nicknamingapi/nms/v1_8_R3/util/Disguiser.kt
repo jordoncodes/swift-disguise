@@ -15,8 +15,9 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnPlayer
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
+import me.onlyjordon.nicknamingapi.INicknamer
 import me.onlyjordon.nicknamingapi.NickData
-import me.onlyjordon.nicknamingapi.Nicknamer
+import me.onlyjordon.nicknamingapi.events.PlayerSkinLayerChangeEvent
 import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.destroyPacket
 import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.getSetMetadataPacket
 import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.playerInfoPacket
@@ -26,6 +27,8 @@ import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.setPlayerInf
 import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.updateClient
 import me.onlyjordon.nicknamingapi.nms.v1_8_R3.util.DisguiserHelper.worldServer
 import me.onlyjordon.nicknamingapi.utils.ReflectionHelper
+import me.onlyjordon.nicknamingapi.utils.Skin
+import me.onlyjordon.nicknamingapi.utils.SkinLayers
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
@@ -49,7 +52,7 @@ import java.util.*
 
 @Internal
 @Suppress("unused")
-class Disguiser : PacketListener,Listener, Nicknamer() {
+class Disguiser : PacketListener,Listener, INicknamer() {
 
     private val fakeUUIDs = WeakHashMap<Player, UUID>()
     private val prefixSuffix = WeakHashMap<Player, PacketPlayOutScoreboardTeam>()
@@ -203,7 +206,7 @@ class Disguiser : PacketListener,Listener, Nicknamer() {
         player.teleport(location)
     }
 
-    override fun setSkin(player: Player, skin: me.onlyjordon.nicknamingapi.utils.Skin): Boolean {
+    override fun setSkin(player: Player, skin: Skin): Boolean {
         val data = data[player.uniqueId] ?: return false
         data.currentSkin = skin
         val profile = (player as CraftPlayer).profile
@@ -215,22 +218,19 @@ class Disguiser : PacketListener,Listener, Nicknamer() {
         return true
     }
 
-    override fun setSkin(player: Player, name: String) {
-        val skin = me.onlyjordon.nicknamingapi.utils.Skin.getSkin(name)
-        if (skin != null) {
-            setSkin(player, skin)
-        }
-    }
-
-    override fun setSkinLayerVisible(player: Player, layer: me.onlyjordon.nicknamingapi.utils.SkinLayers.SkinLayer, visible: Boolean) {
+    override fun setSkinLayerVisible(player: Player, layer: SkinLayers.SkinLayer, visible: Boolean) {
         data[player.uniqueId]?.skinLayers?.setLayerVisible(layer, visible)
     }
-    override fun isSkinLayerVisible(player: Player, layer: me.onlyjordon.nicknamingapi.utils.SkinLayers.SkinLayer): Boolean {
+    override fun isSkinLayerVisible(player: Player, layer: SkinLayers.SkinLayer): Boolean {
         return data[player.uniqueId]?.skinLayers?.isLayerVisible(layer) ?: true
     }
 
-    override fun getSkinLayers(player: Player): me.onlyjordon.nicknamingapi.utils.SkinLayers {
-        return data[player.uniqueId]?.skinLayers ?: me.onlyjordon.nicknamingapi.utils.SkinLayers.getFromRaw(0b0111111)
+    override fun setSkinLayers(player: Player, layers: SkinLayers) {
+        data[player.uniqueId]?.skinLayers = layers
+    }
+
+    override fun getSkinLayers(player: Player): SkinLayers {
+        return data[player.uniqueId]?.skinLayers ?: SkinLayers.getFromRaw(0b0111111)
     }
 
     override fun setNick(player: Player, nick: String) {
@@ -252,8 +252,19 @@ class Disguiser : PacketListener,Listener, Nicknamer() {
             suf = Component.text(LegacyComponentSerializer.legacySection().serialize(prefix).substring(0, 12))
         }
 
+        data[player.uniqueId]?.prefix = pre
+        data[player.uniqueId]?.suffix = suf
+
         val packet = getPrefixSuffixPacket(player, pre.append(reset), reset.append(suf), textColor, remove = false, priority = priority)
         prefixSuffix[player] = packet
+    }
+
+    override fun getPrefix(player: Player?): TextComponent {
+        return data[player?.uniqueId]?.prefix ?: Component.text("")
+    }
+
+    override fun getSuffix(player: Player?): TextComponent {
+        return data[player?.uniqueId]?.suffix ?: Component.text("")
     }
 
     override fun updatePrefixSuffix(player: Player) {
@@ -304,8 +315,15 @@ class Disguiser : PacketListener,Listener, Nicknamer() {
         val player = event.player as Player
         if (event.packetType == PacketType.Play.Client.CLIENT_SETTINGS) {
             val packet = WrapperPlayClientSettings(event)
+            val e = PlayerSkinLayerChangeEvent(player, data[player.uniqueId]?.skinLayers, SkinLayers.getFromRaw(packet.visibleSkinSectionMask))
+            Bukkit.getPluginManager().callEvent(e)
+            if (e.isCancelled) {
+                packet.visibleSkinSectionMask = data[player.uniqueId]?.skinLayers?.rawSkinLayers ?: 0b0000000
+            } else {
+                packet.visibleSkinSectionMask = e.newLayers?.rawSkinLayers ?: 0b0000000
+            }
             if (data[player.uniqueId]?.skinLayers == null) {
-                data[player.uniqueId]?.skinLayers = me.onlyjordon.nicknamingapi.utils.SkinLayers.getFromRaw(packet.visibleSkinSectionMask)
+                data[player.uniqueId]?.skinLayers = SkinLayers.getFromRaw(packet.visibleSkinSectionMask)
             }
         }
     }

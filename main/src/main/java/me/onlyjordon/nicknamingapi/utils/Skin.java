@@ -50,5 +50,11 @@ public class Skin {
         }
     }
 
-
+    @Override
+    public String toString() {
+        return "Skin{" +
+                "value='" + value + '\'' +
+                ", signature='" + signature + '\'' +
+                '}';
+    }
 }
