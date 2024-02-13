@@ -108,3 +108,4 @@ I'm getting a null nicknamer error? What do I do?
 
 You probably have Nicknamer API in your jar. Try following [this](https://github.com/jordoncodes/nicknamer-api?tab=readme-ov-file#maven)
 
+If you're having another issue, and nothing is in console, you could try setting the environment variable NICKNAMER_DEV to true, and it will print out information in chat, and allow you to use `/nickdev`. 
