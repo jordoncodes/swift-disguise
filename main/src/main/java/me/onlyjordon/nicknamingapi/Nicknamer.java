@@ -68,7 +68,7 @@ public class Nicknamer {
     public void setSkinLayerVisible(@NotNull Player player, @NotNull SkinLayers.SkinLayer layer, boolean visible) {
         SkinLayers layers = nicknamerImpl.getSkinLayers(player).copy();
         layers.setLayerVisible(layer, visible);
-        PlayerSkinLayerChangeEvent event = new PlayerSkinLayerChangeEvent(player, nicknamerImpl.getSkinLayers(player), layers);
+        PlayerSkinLayerChangeEvent event = new PlayerSkinLayerChangeEvent(player, nicknamerImpl.getSkinLayers(player), layers, PlayerSkinLayerChangeEvent.Reason.PLUGIN);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled())
             return;

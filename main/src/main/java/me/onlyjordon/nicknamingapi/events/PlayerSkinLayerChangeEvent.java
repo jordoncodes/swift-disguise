@@ -16,12 +16,18 @@ public class PlayerSkinLayerChangeEvent extends Event implements Cancellable {
     private final SkinLayers previousLayers;
     private SkinLayers currentLayers;
     private final Player player;
+    private final Reason reason;
 
-    public PlayerSkinLayerChangeEvent(Player who, SkinLayers prev, SkinLayers current) {
+    public PlayerSkinLayerChangeEvent(Player who, SkinLayers prev, SkinLayers current, Reason reason) {
         super(!Bukkit.isPrimaryThread());
         this.player = who;
         this.previousLayers = prev;
         this.currentLayers = current;
+        this.reason = reason;
+    }
+
+    public Reason getReason() {
+        return reason;
     }
 
     public Player getPlayer() {
@@ -59,5 +65,10 @@ public class PlayerSkinLayerChangeEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
+    }
+
+    public enum Reason {
+        PLAYER,
+        PLUGIN
     }
 }

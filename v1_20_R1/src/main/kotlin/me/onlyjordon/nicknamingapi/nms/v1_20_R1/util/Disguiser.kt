@@ -150,7 +150,7 @@ class Disguiser: Listener,PacketListener, INicknamer() {
         val player = event.player as Player
         if (event.packetType == PacketType.Play.Client.CLIENT_SETTINGS) {
             val packet = WrapperPlayClientSettings(event)
-            val e = PlayerSkinLayerChangeEvent(player, data[player.uniqueId]?.skinLayers, SkinLayers.getFromRaw(packet.visibleSkinSectionMask))
+            val e = PlayerSkinLayerChangeEvent(player, data[player.uniqueId]?.skinLayers, SkinLayers.getFromRaw(packet.visibleSkinSectionMask), PlayerSkinLayerChangeEvent.Reason.PLAYER)
             Bukkit.getPluginManager().callEvent(e)
             if (e.isCancelled) {
                 packet.visibleSkinSectionMask = data[player.uniqueId]?.skinLayers?.rawSkinLayers ?: 0b0000000

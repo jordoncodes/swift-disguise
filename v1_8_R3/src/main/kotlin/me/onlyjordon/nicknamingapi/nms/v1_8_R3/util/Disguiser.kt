@@ -80,15 +80,15 @@ class Disguiser : PacketListener,Listener, INicknamer() {
         PacketEvents.getAPI().init()
     }
 
-    override fun getSkin(player: Player): me.onlyjordon.nicknamingapi.utils.Skin {
-        return data[player.uniqueId]?.currentSkin ?: data[player.uniqueId]?.originalSkin ?: me.onlyjordon.nicknamingapi.utils.Skin(
+    override fun getSkin(player: Player): Skin {
+        return data[player.uniqueId]?.currentSkin ?: data[player.uniqueId]?.originalSkin ?: Skin(
             null,
             null
         )
     }
 
-    override fun getSkin(skinName: String): me.onlyjordon.nicknamingapi.utils.Skin {
-        return me.onlyjordon.nicknamingapi.utils.Skin.getSkin(skinName)
+    override fun getSkin(skinName: String): Skin {
+        return Skin.getSkin(skinName)
     }
 
 
@@ -96,11 +96,11 @@ class Disguiser : PacketListener,Listener, INicknamer() {
     fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
         val skin = (player as CraftPlayer).handle.profile.properties["textures"].firstOrNull()?.let {
-            me.onlyjordon.nicknamingapi.utils.Skin(
+            Skin(
                 it.value,
                 it.signature
             )
-        } ?: me.onlyjordon.nicknamingapi.utils.Skin(null, null)
+        } ?: Skin(null, null)
         data[player.uniqueId] = NickData(
             skin,
             player.name,
@@ -315,7 +315,7 @@ class Disguiser : PacketListener,Listener, INicknamer() {
         val player = event.player as Player
         if (event.packetType == PacketType.Play.Client.CLIENT_SETTINGS) {
             val packet = WrapperPlayClientSettings(event)
-            val e = PlayerSkinLayerChangeEvent(player, data[player.uniqueId]?.skinLayers, SkinLayers.getFromRaw(packet.visibleSkinSectionMask))
+            val e = PlayerSkinLayerChangeEvent(player, data[player.uniqueId]?.skinLayers, SkinLayers.getFromRaw(packet.visibleSkinSectionMask), PlayerSkinLayerChangeEvent.Reason.PLAYER)
             Bukkit.getPluginManager().callEvent(e)
             if (e.isCancelled) {
                 packet.visibleSkinSectionMask = data[player.uniqueId]?.skinLayers?.rawSkinLayers ?: 0b0000000
@@ -337,7 +337,7 @@ class Disguiser : PacketListener,Listener, INicknamer() {
         val id = getFakeUUID(other)
         profile.name = data.nickname ?: other.name
         if (hideUUID) profile.uuid = id // fake uuid
-        val skin = data.currentSkin ?: data.originalSkin ?: me.onlyjordon.nicknamingapi.utils.Skin(
+        val skin = data.currentSkin ?: data.originalSkin ?: Skin(
             null,
             null
         )

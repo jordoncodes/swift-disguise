@@ -10,6 +10,7 @@ The main features of this API are: changing a player's name, changing a player's
 # You can download in the releases section, on [SpigotMC](https://www.spigotmc.org/resources/nicknamer-api.115002/) or on [PaperMC Hangar](https://hangar.papermc.io/onlyjordon/Nicknamer-API).
 
 ## Basic Usage
+A very basic example plugin you can make yours from: [CapeHider](https://github.com/jordoncodes/CapeHider)
 
 ### maven
 Include the dependency in a maven project:
@@ -39,9 +40,9 @@ Nicknamer disguiser = NicknamerAPI.getNicknamer();
 
 // then call:
 disguiser.setNick(player, "nickname");
-disguiser.setSkin(player, "Notch");
 disguiser.setSkinLayerVisible(player, SkinLayers.SkinLayer.CAPE, false); // hide cape
-disguiser.refreshPlayer(player);
+disguiser.setSkin(player, "Notch"); // when using a string for the skin (instead of a Skin), it's best to set the
+                                    // skin last because it calls refreshPlayer() as it downloads the skin async.
 ```
 
 Alternatively, you can use Kotlin extension functions:
@@ -61,9 +62,45 @@ disguiser.setPrefixSuffix(player, Component.text(ChatColor.RED+"Prefix"), Compon
 // apply the change:
 disguiser.updatePrefixSuffix(player);
 ```
+
 This would make the name of the player in the tablist and above their head "Prefix {player's nickname} Suffix". This uses [Adventure](https://docs.advntr.dev/index.html).
 
-Example plugin you can make yours from: [CapeHider](https://github.com/jordoncodes/CapeHider)
+# Events
+There are a few events you could use that this plugin makes.
+
+Example of an event to keep the values of setSkinLayerVisible (it changes when the player changes their skin layers by default):
+```java
+@EventHandler
+public void onSkinLayerChange(PlayerSkinLayerChangeEvent event) {
+    // Reason.PLAYER = player changed their skinlayers
+    // Reason.PLUGIN = plugin changed their skinlayers
+    if (e.reason() == PlayerSkinLayerChangeEvent.Reason.PLAYER) e.setCancelled(true);
+}
+```
+disable changing nicknames entirely:
+
+```java
+@EventHandler
+public void onNickChange(PlayerNickChangeEvent event) {
+    event.setCancelled(true);
+}
+```
+force everyone's skin to be a certain skin:
+
+```java
+@EventHandler
+public void onJoin(PlayerJoinEvent event) {
+    NicknamerAPI.getNicknamer().setSkin(event.getPlayer(), "Notch");
+    NicknamerAPI.getNicknamer().refreshPlayer(event.getPlayer());
+}
+
+@EventHandler
+public void onSkinChange(PlayerSkinChangeEvent event) {
+    event.setNewSkin(Skin.getSkin("Notch"));
+}
+```
+
+and more in the `me.onlyjordon.nicknamingapi.events` package.
 
 # Errors
 ## Null Nicknamer
