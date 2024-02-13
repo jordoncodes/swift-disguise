@@ -74,7 +74,7 @@ Example of an event to keep the values of setSkinLayerVisible (it changes when t
 public void onSkinLayerChange(PlayerSkinLayerChangeEvent event) {
     // Reason.PLAYER = player changed their skinlayers
     // Reason.PLUGIN = plugin changed their skinlayers
-    if (e.reason() == PlayerSkinLayerChangeEvent.Reason.PLAYER) e.setCancelled(true);
+    if (e.getReason() == PlayerSkinLayerChangeEvent.Reason.PLAYER) e.setCancelled(true);
 }
 ```
 disable changing nicknames entirely:
