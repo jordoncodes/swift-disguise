@@ -302,7 +302,6 @@ class Disguiser: Listener,PacketListener, INicknamer() {
 
     override fun setNick(player: Player, nick: String) {
         val data = data[player.uniqueId] ?: return
-        println("Setting nick to $nick")
         data.nickname = nick
     }
 

@@ -45,10 +45,8 @@ class CommandDev : PlayerOnlyCommand("nickdev", "nicknamerapi.dev") {
             }
             if ("skinlayers".equals(args[0], ignoreCase = true)) {
                 player.sendMessage("Setting random skin layers to 0...")
-                println(NicknamerAPI.getNicknamer().getSkinLayers(player).rawSkinLayers)
                 NicknamerAPI.getNicknamer().setSkinLayerVisible(player, me.onlyjordon.nicknamingapi.utils.SkinLayers.SkinLayer.entries[ThreadLocalRandom.current().nextInt(
                     me.onlyjordon.nicknamingapi.utils.SkinLayers.SkinLayer.entries.size)], false)
-                println(NicknamerAPI.getNicknamer().getSkinLayers(player).rawSkinLayers)
                 player.sendMessage("Skin layers set!")
                 return true
             }

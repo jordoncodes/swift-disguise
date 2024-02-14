@@ -96,7 +96,6 @@ public class Nicknamer {
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled())
             return;
-        System.out.println("new nick: " + event.getNewNick() + " // old nick: " + event.getPreviousNick());
         if (event.getNewNick() == null)
             nicknamerImpl.resetNick(player);
         else
