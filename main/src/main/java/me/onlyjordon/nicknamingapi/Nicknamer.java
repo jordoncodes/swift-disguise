@@ -116,6 +116,7 @@ public class Nicknamer {
 
     public void setPrefixSuffix(@NotNull Player player, @NotNull TextComponent prefix, @NotNull TextComponent suffix, @NotNull ChatColor color, int priority) {
         PlayerPrefixSuffixChangeEvent event = new PlayerPrefixSuffixChangeEvent(player, getPrefix(player), getSuffix(player), prefix, suffix, color, priority);
+        removePrefixSuffix(player);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled())
             return;
@@ -124,6 +125,10 @@ public class Nicknamer {
         if (pref == null) pref = Component.text("");
         if (suff == null) suff = Component.text("");
         nicknamerImpl.setPrefixSuffix(player, pref, suff, event.getColor(), event.getPriority());
+    }
+
+    private void removePrefixSuffix(Player player) {
+        nicknamerImpl.removePrefixSuffix(player);
     }
 
     public TextComponent getPrefix(@NotNull Player player) {

@@ -267,6 +267,16 @@ class Disguiser : PacketListener,Listener, INicknamer() {
         return data[player?.uniqueId]?.suffix ?: Component.text("")
     }
 
+    override fun removePrefixSuffix(player: Player?) {
+        prefixSuffix[player]?.let {
+            ReflectionHelper.setFieldValue("h", 1, it) // method
+            Bukkit.getOnlinePlayers().forEach { p ->
+                (p as CraftPlayer).handle.playerConnection.sendPacket(it)
+            }
+        }
+        prefixSuffix.remove(player)
+    }
+
     override fun updatePrefixSuffix(player: Player) {
         Bukkit.getOnlinePlayers().forEach {
             (it as CraftPlayer).handle.playerConnection.sendPacket(getPrefixSuffixPacket(player, remove = true))

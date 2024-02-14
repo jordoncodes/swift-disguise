@@ -19,6 +19,7 @@ import io.netty.buffer.Unpooled
 import me.onlyjordon.nicknamingapi.INicknamer
 import me.onlyjordon.nicknamingapi.NickData
 import me.onlyjordon.nicknamingapi.events.PlayerSkinLayerChangeEvent
+import me.onlyjordon.nicknamingapi.utils.ReflectionHelper
 import me.onlyjordon.nicknamingapi.utils.Skin
 import me.onlyjordon.nicknamingapi.utils.SkinLayers
 import net.kyori.adventure.text.TextComponent
@@ -351,6 +352,16 @@ class Disguiser: Listener,PacketListener, INicknamer() {
 
     override fun getSuffix(player: Player?): TextComponent {
         return data[player?.uniqueId]?.suffix ?: net.kyori.adventure.text.Component.text("")
+    }
+
+    override fun removePrefixSuffix(player: Player?) {
+        prefixSuffix[player]?.let {
+            ReflectionHelper.setFieldValue("h", 1, it) // method
+            Bukkit.getOnlinePlayers().forEach { p ->
+                (p as CraftPlayer).handle.connection.send(it)
+            }
+        }
+        prefixSuffix.remove(player)
     }
 
     override fun updatePrefixSuffix(player: Player) {

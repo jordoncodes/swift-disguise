@@ -162,4 +162,6 @@ public abstract class INicknamer {
     public abstract TextComponent getPrefix(Player player);
 
     public abstract TextComponent getSuffix(Player player);
+
+    public abstract void removePrefixSuffix(Player player);
 }
