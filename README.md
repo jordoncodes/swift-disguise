@@ -42,7 +42,19 @@ Nicknamer disguiser = NicknamerAPI.getNicknamer();
 disguiser.setNick(player, "nickname");
 disguiser.setSkinLayerVisible(player, SkinLayers.SkinLayer.CAPE, false); // hide cape
 disguiser.setSkin(player, "Notch"); // when using a string for the skin (instead of a Skin), it's best to set the
-                                    // skin last because it calls refreshPlayer() as it downloads the skin async.
+                                    // skin last because it calls refreshPlayer() as it downloads the skin async
+                                    // then you don't need to call refreshPlayer()
+
+// a better version of this:
+// you could make it not async or get rid of the bukkit task, but it would download the skin synchronously
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, ()-> {
+            Skin skin = Skin.getSkin("Notch"); // get skin
+            disguiser.setNick(player, "nickname"); // set nickname
+            disguiser.setSkinLayerVisible(player, SkinLayers.SkinLayer.CAPE, false); // hide cape
+            disguiser.setPrefixSuffix(player, Component.text(ChatColor.GREEN + "A prefix "), Component.text(""), ChatColor.GRAY, 1); // set prefix & suffix
+            disguiser.setSkin(player, skin); // set skin, doing setSkin(Player,String) will create another async task
+            disguiser.refreshPlayer(player); // update all of ^
+        });
 ```
 
 Alternatively, you can use Kotlin extension functions:
