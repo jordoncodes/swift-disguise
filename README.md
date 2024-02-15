@@ -76,6 +76,13 @@ public void onSkinLayerChange(PlayerSkinLayerChangeEvent event) {
     // Reason.PLUGIN = plugin changed their skinlayers
     if (e.getReason() == PlayerSkinLayerChangeEvent.Reason.PLAYER) e.setCancelled(true);
 }
+// or this
+@EventHandler
+public void onSkinLayerChange(PlayerSkinLayerChangeEvent event) {
+    // force hat to be enabled:
+    SkinLayers layers = event.getNewLayers();
+    layers.setLayerVisible(SkinLayers.SkinLayer.HAT, true);
+}
 ```
 disable changing nicknames entirely:
 
