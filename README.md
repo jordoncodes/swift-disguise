@@ -82,6 +82,7 @@ public void onSkinLayerChange(PlayerSkinLayerChangeEvent event) {
     // force hat to be enabled:
     SkinLayers layers = event.getNewLayers();
     layers.setLayerVisible(SkinLayers.SkinLayer.HAT, true);
+    event.setNewLayers(layers);
 }
 ```
 disable changing nicknames entirely:
