@@ -1,7 +1,9 @@
 package me.onlyjordon.nicknamingapi.debug
 
+import me.onlyjordon.nicknamingapi.DisguiseBuilder
 import me.onlyjordon.nicknamingapi.NicknamerAPI
 import me.onlyjordon.nicknamingapi.commands.PlayerOnlyCommand
+import me.onlyjordon.nicknamingapi.utils.SkinLayers
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.ChatColor
@@ -51,6 +53,14 @@ class CommandDev : PlayerOnlyCommand("nickdev", "nicknamerapi.dev") {
                 return true
             }
 
+        }
+        if ("builder".equals(args[0], ignoreCase = true)) {
+            DisguiseBuilder(NicknamerAPI.getNicknamer())
+                .setNick("example")
+                .setSkin("phoave")
+                .setPrefixSuffix("Admin ", " Test")
+                .setSkinLayerVisible(SkinLayers.SkinLayer.CAPE, false)
+                .apply(player)
         }
         return false
     }
