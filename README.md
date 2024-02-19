@@ -1,4 +1,4 @@
-# Nicknamer-API
+# SwiftDisguise
 This is a simple API that allows you to nickname a player. It currently supports Spigot 1.8.8 and 1.20.4 and paper for both versions. For 1.8 users, I would recommend using a fork like [PandaSpigot](https://github.com/hpfxd/PandaSpigot).
 Used in: 
 - [CapeHider (plugin)](https://github.com/jordoncodes/CapeHider)
