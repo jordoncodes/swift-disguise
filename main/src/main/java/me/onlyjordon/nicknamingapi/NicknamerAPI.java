@@ -31,7 +31,6 @@ public final class NicknamerAPI extends JavaPlugin implements Listener {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void onLoad() {
         setNicknamer();
         Utils.checkFloodgate();
@@ -41,6 +40,7 @@ public final class NicknamerAPI extends JavaPlugin implements Listener {
     }
 
 
+    @SuppressWarnings("unchecked")
     private void setNicknamer() {
         String verAndRev = NMSUtils.getMinecraftPackage();
         try {

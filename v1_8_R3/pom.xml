@@ -6,7 +6,7 @@
 
     <groupId>me.onlyjordon</groupId>
     <artifactId>nicknamer-api-implementation-v1_8_R3</artifactId>
-    <version>v1.2.0</version>
+    <version>v1.3.0</version>
     <packaging>jar</packaging>
 
     <name>nicknamer-api-implementation-v1_8_R3</name>
@@ -130,13 +130,13 @@
         <dependency>
             <groupId>me.onlyjordon</groupId>
             <artifactId>nicknamer-api-main</artifactId>
-            <version>v1.2.0</version>
+            <version>v1.3.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.onlyjordon</groupId>
             <artifactId>nicknamer-api-nms-common</artifactId>
-            <version>v1.2.0</version>
+            <version>v1.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>

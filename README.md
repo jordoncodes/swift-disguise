@@ -27,7 +27,7 @@ Include the dependency in a maven project:
     <dependency>
         <groupId>com.github.jordoncodes</groupId>
         <artifactId>nicknamer-api</artifactId>
-        <version>v1.2.0</version>
+        <version>v1.3.0</version>
         <scope>provided</scope> <!-- without this, Nicknamer.getDisguiser() will give you null -->
     </dependency>
 </dependencies>
@@ -45,6 +45,7 @@ new DisguiseBuilder(nicknamer)
         .apply(player);
 ```
 
+You could also use the Nicknamer functions directly, rather than using a builder:
 ```java 
 // get the api
 Nicknamer disguiser = NicknamerAPI.getNicknamer();
@@ -58,14 +59,14 @@ disguiser.setSkin(player, "Notch"); // when using a string for the skin (instead
 
 // a better version of this:
 // you could make it not async or get rid of the bukkit task, but it would download the skin synchronously
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, ()-> {
-            Skin skin = Skin.getSkin("Notch"); // get skin
-            disguiser.setNick(player, "nickname"); // set nickname
-            disguiser.setSkinLayerVisible(player, SkinLayers.SkinLayer.CAPE, false); // hide cape
-            disguiser.setPrefixSuffix(player, Component.text(ChatColor.GREEN + "A prefix "), Component.text(""), ChatColor.GRAY, 1); // set prefix & suffix
-            disguiser.setSkin(player, skin); // set skin, doing setSkin(Player,String) will create another async task
-            disguiser.refreshPlayer(player); // update all of ^
-        });
+Bukkit.getScheduler().runTaskAsynchronously(plugin, ()-> {
+    Skin skin = Skin.getSkin("Notch"); // get skin
+    disguiser.setNick(player, "nickname"); // set nickname
+    disguiser.setSkinLayerVisible(player, SkinLayers.SkinLayer.CAPE, false); // hide cape
+    disguiser.setPrefixSuffix(player, Component.text(ChatColor.GREEN + "A prefix "), Component.text(""), ChatColor.GRAY, 1); // set prefix & suffix
+    disguiser.setSkin(player, skin); // set skin, doing setSkin(Player,String) will create another async task
+    disguiser.refreshPlayer(player); // update all of ^
+});
 ```
 
 Alternatively, you can use Kotlin extension functions:
