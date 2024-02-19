@@ -1,6 +1,7 @@
 package me.onlyjordon.nicknamingapi;
 
 import me.onlyjordon.nicknamingapi.utils.NMSUtils;
+import me.onlyjordon.nicknamingapi.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,6 +34,7 @@ public final class NicknamerAPI extends JavaPlugin implements Listener {
     @SuppressWarnings("unchecked")
     public void onLoad() {
         setNicknamer();
+        Utils.checkFloodgate();
         String env = System.getenv("NICKNAMER_DEV");
         if (env != null)
             isDev = env.equalsIgnoreCase("true");

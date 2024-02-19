@@ -22,6 +22,7 @@ import me.onlyjordon.nicknamingapi.events.PlayerSkinLayerChangeEvent
 import me.onlyjordon.nicknamingapi.utils.ReflectionHelper
 import me.onlyjordon.nicknamingapi.utils.Skin
 import me.onlyjordon.nicknamingapi.utils.SkinLayers
+import me.onlyjordon.nicknamingapi.utils.Utils
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer
 import net.minecraft.ChatFormatting
@@ -67,12 +68,12 @@ class Disguiser: Listener,PacketListener, INicknamer() {
     }
 
     private fun getFakeUUID(player: Player): UUID {
-        val d = data[player.uniqueId] ?: return UUID.randomUUID()
-        val id = d.fakeUUID ?: UUID.randomUUID()
-        d.fakeUUID = id
-        return id
+        return getFakeUUID(player.uniqueId)
     }
     private fun getFakeUUID(uuid: UUID): UUID {
+        if (Utils.isBedrockPlayer(uuid)) {
+            return uuid
+        }
         val d = data[uuid] ?: return UUID.randomUUID()
         val id = d.fakeUUID ?: UUID.randomUUID()
         d.fakeUUID = id
@@ -91,10 +92,10 @@ class Disguiser: Listener,PacketListener, INicknamer() {
     }
 
     override fun getSkin(player: Player): Skin {
-        val d = data[player.uniqueId] ?: return Skin(null, null)
+        val d = data[player.uniqueId] ?: return Skin("", "")
         d.currentSkin = d.currentSkin ?: d.originalSkin ?: Skin(
-            null,
-            null
+            "",
+            ""
         )
         return d.currentSkin
     }
@@ -185,22 +186,24 @@ class Disguiser: Listener,PacketListener, INicknamer() {
         val player = e.player
         val metadata = (player as CraftPlayer).handle.entityData
         var rawLayers = 0.toByte()
-        metadata.nonDefaultValues?.forEach {
-            if (it.id == 17)
-                if (it.value is Byte) rawLayers = it.value as Byte
+        if (!Utils.isBedrockPlayer(player)) {
+            metadata.nonDefaultValues?.forEach {
+                if (it.id == 17)
+                    if (it.value is Byte) rawLayers = it.value as Byte
+            }
         }
         data[player.uniqueId] = NickData(
             player.profile.properties.get("textures").firstOrNull()?.let {
                 Skin(
-                    it.value,
-                    it.signature
+                    it.value ?: "",
+                    it.signature ?: ""
                 )
-            },
+            } ?: Skin("", ""),
             player.name,
             net.kyori.adventure.text.Component.text(""),
             net.kyori.adventure.text.Component.text(""),
             SkinLayers.getFromRaw(rawLayers),
-            UUID.randomUUID()
+            getFakeUUID(player)
         )
         prefixSuffix.values.forEach {
             player.handle.connection.send(it)
@@ -240,6 +243,7 @@ class Disguiser: Listener,PacketListener, INicknamer() {
         player.location.world?.players?.forEach {
             if (it != player) {
                 if (!Bukkit.isPrimaryThread()) Bukkit.getScheduler().runTask(plugin, Runnable {
+                    if (!player.isOnline) return@Runnable
                     it.hidePlayer(player)
                 })
                 else {
@@ -259,6 +263,7 @@ class Disguiser: Listener,PacketListener, INicknamer() {
         player.location.world?.players?.forEach {
             if (it != player) {
                 if (!Bukkit.isPrimaryThread()) Bukkit.getScheduler().runTaskLater(plugin, Runnable {
+                    if (!player.isOnline) return@Runnable
                     it.showPlayer(player)
                 }, 1)
                 else {
