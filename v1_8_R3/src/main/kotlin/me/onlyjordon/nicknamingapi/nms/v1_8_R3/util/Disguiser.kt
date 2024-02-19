@@ -190,20 +190,23 @@ class Disguiser : PacketListener,Listener, INicknamer() {
         val dim = worldServer.world.environment.id
         val playerList = MinecraftServer.getServer().playerList
         val newEnv = World.Environment.entries[dim+2 % World.Environment.entries.size]
-        playerList.moveToWorld(entityPlayer, newEnv.id, true)
-        entityPlayer.playerConnection.sendPacket(
-            PacketPlayOutRespawn(
-                dim,
-                worldServer.difficulty,
-                worldServer.getWorldData().type,
-                entityPlayer.playerInteractManager.gameMode
+        Bukkit.getScheduler().runTask(plugin) {
+            if (player.isOnline)
+            playerList.moveToWorld(entityPlayer, newEnv.id, true)
+            entityPlayer.playerConnection.sendPacket(
+                PacketPlayOutRespawn(
+                    dim,
+                    worldServer.difficulty,
+                    worldServer.getWorldData().type,
+                    entityPlayer.playerInteractManager.gameMode
+                )
             )
-        )
 
-        entityPlayer.worldServer.playerChunkMap.addPlayer(entityPlayer)
-        playerList.updateClient(entityPlayer)
-        entityPlayer.updateClient()
-        player.teleport(location)
+            entityPlayer.worldServer.playerChunkMap.addPlayer(entityPlayer)
+            playerList.updateClient(entityPlayer)
+            entityPlayer.updateClient()
+            player.teleport(location)
+        }
     }
 
     override fun setSkin(player: Player, skin: Skin): Boolean {

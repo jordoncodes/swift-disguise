@@ -34,6 +34,17 @@ Include the dependency in a maven project:
 ```
 
 After that you can simply:
+
+```java
+Nicknamer namer = NicknamerAPI.getNicknamer();
+new DisguiseBuilder(nicknamer)
+        .setNick("nickname")
+        .setSkin("Notch")
+        .setPrefixSuffix(Component.text(ChatColor.RED+"Prefix"), Component.text(ChatColor.GREEN+"Suffix"), ChatColor.WHITE, 0)
+        .setSkinLayerVisible(SkinLayers.SkinLayer.CAPE, false)
+        .apply(player);
+```
+
 ```java 
 // get the api
 Nicknamer disguiser = NicknamerAPI.getNicknamer();

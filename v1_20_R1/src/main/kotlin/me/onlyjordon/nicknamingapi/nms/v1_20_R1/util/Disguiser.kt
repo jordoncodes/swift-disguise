@@ -20,7 +20,9 @@ import me.onlyjordon.nicknamingapi.INicknamer
 import me.onlyjordon.nicknamingapi.NickData
 import me.onlyjordon.nicknamingapi.events.PlayerSkinLayerChangeEvent
 import me.onlyjordon.nicknamingapi.utils.ReflectionHelper
+import me.onlyjordon.nicknamingapi.utils.Skin
 import me.onlyjordon.nicknamingapi.utils.SkinLayers
+import me.onlyjordon.nicknamingapi.utils.Utils
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer
 import net.minecraft.ChatFormatting
@@ -66,17 +68,19 @@ class Disguiser: Listener,PacketListener, INicknamer() {
     }
 
     private fun getFakeUUID(player: Player): UUID {
-        val d = data[player.uniqueId] ?: return UUID.randomUUID()
-        val id = d.fakeUUID ?: UUID.randomUUID()
-        d.fakeUUID = id
-        return id
+        return getFakeUUID(player.uniqueId)
     }
+
     private fun getFakeUUID(uuid: UUID): UUID {
+        if (Utils.isBedrockPlayer(uuid)) {
+            return uuid
+        }
         val d = data[uuid] ?: return UUID.randomUUID()
         val id = d.fakeUUID ?: UUID.randomUUID()
         d.fakeUUID = id
         return id
     }
+
 
 
     override fun disable() {
@@ -89,17 +93,17 @@ class Disguiser: Listener,PacketListener, INicknamer() {
         setFields()
     }
 
-    override fun getSkin(player: Player): me.onlyjordon.nicknamingapi.utils.Skin {
-        val d = data[player.uniqueId] ?: return me.onlyjordon.nicknamingapi.utils.Skin(null, null)
-        d.currentSkin = d.currentSkin ?: d.originalSkin ?: me.onlyjordon.nicknamingapi.utils.Skin(
+    override fun getSkin(player: Player): Skin {
+        val d = data[player.uniqueId] ?: return Skin(null, null)
+        d.currentSkin = d.currentSkin ?: d.originalSkin ?: Skin(
             null,
             null
         )
         return d.currentSkin
     }
 
-    override fun getSkin(skinName: String): me.onlyjordon.nicknamingapi.utils.Skin {
-        return me.onlyjordon.nicknamingapi.utils.Skin.getSkin(skinName)
+    override fun getSkin(skinName: String): Skin {
+        return Skin.getSkin(skinName)
     }
 
     override fun onPacketSend(event: PacketSendEvent) {
@@ -171,7 +175,7 @@ class Disguiser: Listener,PacketListener, INicknamer() {
         val id = getFakeUUID(other)
         profile.name = data.nickname ?: other.name
         if (hideUUID) profile.uuid = id // fake uuid
-        val skin = data.currentSkin ?: data.originalSkin ?: me.onlyjordon.nicknamingapi.utils.Skin(
+        val skin = data.currentSkin ?: data.originalSkin ?: Skin(
             null,
             null
         )
@@ -181,18 +185,26 @@ class Disguiser: Listener,PacketListener, INicknamer() {
     @EventHandler(priority = EventPriority.LOWEST)
     fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
+        val metadata = (player as CraftPlayer).handle.entityData
+        var rawLayers = 0.toByte()
+        if (!Utils.isBedrockPlayer(player)) {
+            metadata.nonDefaultValues?.forEach {
+                if (it.id == 17)
+                    if (it.value is Byte) rawLayers = it.value as Byte
+            }
+        }
         data[player.uniqueId] = NickData(
-            (player as CraftPlayer).profile.properties.get("textures").firstOrNull()?.let {
-                me.onlyjordon.nicknamingapi.utils.Skin(
-                    it.value,
-                    it.signature
+            player.profile.properties.get("textures").firstOrNull()?.let {
+                Skin(
+                    it.value ?: "",
+                    it.signature ?: ""
                 )
-            },
+            } ?: Skin("", ""),
             player.name,
             net.kyori.adventure.text.Component.text(""),
             net.kyori.adventure.text.Component.text(""),
-            null, // is set in packet listener
-            UUID.randomUUID()
+            SkinLayers.getFromRaw(rawLayers),
+            getFakeUUID(player)
         )
         prefixSuffix.values.forEach {
             player.handle.connection.send(it)
@@ -228,9 +240,15 @@ class Disguiser: Listener,PacketListener, INicknamer() {
     }
 
     override fun refreshPlayer(player: Player) {
+        val plugin = JavaPlugin.getProvidingPlugin(this.javaClass)
         player.location.world?.players?.forEach {
             if (it != player) {
-                it.hidePlayer(player)
+                if (Bukkit.isPrimaryThread())
+                    it.hidePlayer(player)
+                else Bukkit.getScheduler().runTask(plugin, Runnable {
+                    if (!player.isOnline) return@Runnable
+                    it.hidePlayer(player)
+                })
             }
         }
         if (!player.isOnline) return
@@ -243,9 +261,12 @@ class Disguiser: Listener,PacketListener, INicknamer() {
             prefixSuffix[player]?.let { other.handle.connection.send(it) }
         }
         player.location.world?.players?.forEach {
-            if (it != player) {
+            if (Bukkit.isPrimaryThread())
                 it.showPlayer(player)
-            }
+            else Bukkit.getScheduler().runTaskLater(plugin, Runnable {
+                if (!player.isOnline) return@Runnable
+                it.showPlayer(player)
+            }, 1)
         }
         val entityPlayer = (player as CraftPlayer).handle
 
@@ -255,7 +276,7 @@ class Disguiser: Listener,PacketListener, INicknamer() {
         entityPlayer.sendAllPlayerInfo()
     }
 
-    override fun setSkin(player: Player, skin: me.onlyjordon.nicknamingapi.utils.Skin): Boolean { // maybe replace with Paper's API for it?
+    override fun setSkin(player: Player, skin: Skin): Boolean { // maybe replace with Paper's API for it?
         val data = data[player.uniqueId] ?: return false
         val craftPlayer = player as CraftPlayer
         craftPlayer.profile.properties.removeAll("textures")
