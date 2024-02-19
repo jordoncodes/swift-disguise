@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.onlyjordon</groupId>
-    <artifactId>nicknamer-api-implementation-v1_20_R3</artifactId>
+    <artifactId>swift-disguise-implementation-v1_20_R3</artifactId>
     <version>v1.3.0</version>
     <packaging>jar</packaging>
 
-    <name>nicknamer-api-implementation-v1_20_R3</name>
+    <name>swift-disguise-implementation-v1_20_R3</name>
 
     <properties>
         <java.version>1.8</java.version>
@@ -35,7 +35,7 @@
                     <relocations>
                         <relocation>
                             <pattern>io.papermc.lib</pattern>
-                            <shadedPattern>me.onlyjordon.nicknamingapi.nms.v1_20_R3.paperlib</shadedPattern>
+                            <shadedPattern>me.onlyjordon.swiftdisguise.nms.v1_20_R3.paperlib</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -191,13 +191,13 @@
         </dependency>
         <dependency>
             <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-main</artifactId>
+            <artifactId>swift-disguise-main</artifactId>
             <version>v1.3.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-nms-common</artifactId>
+            <artifactId>swift-disguise-nms-common</artifactId>
             <version>v1.3.0</version>
         </dependency>
         <dependency>

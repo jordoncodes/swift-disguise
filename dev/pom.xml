@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.onlyjordon</groupId>
-    <artifactId>nicknamer-api-dev</artifactId>
+    <artifactId>swift-disguise-dev</artifactId>
     <version>v1.3.0</version>
     <packaging>jar</packaging>
 
-    <name>nicknamer-api-dev</name>
+    <name>swift-disguise-dev</name>
 
     <properties>
         <java.version>1.8</java.version>
@@ -32,10 +32,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <finalName>Nicknamer-API-${project.version}</finalName>
-                    <outputDirectory>${project.basedir}/../servers/${miencraft.version}/plugins</outputDirectory>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -133,7 +129,7 @@
         </dependency>
         <dependency>
             <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-main</artifactId>
+            <artifactId>swift-disguise-main</artifactId>
             <version>v1.3.0</version>
             <scope>provided</scope>
         </dependency>

@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.onlyjordon</groupId>
-    <artifactId>nicknamer-api</artifactId>
+    <artifactId>swift-disguise-spigot</artifactId>
     <version>v1.3.0</version>
     <packaging>jar</packaging>
 
-    <name>Nicknamer-API</name>
+    <name>swift-disguise</name>
 
     <properties>
         <java.version>1.8</java.version>
@@ -33,7 +33,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>Nicknamer-API-${project.version}</finalName>
                     <outputDirectory>${project.basedir}/../servers/${minecraft.version}/plugins</outputDirectory>
                 </configuration>
             </plugin>
@@ -51,56 +50,41 @@
                         <configuration>
                             <sourceDirs>
                                 <source>src/main/java</source>
-                                <source>src/main/kotlin</source>
                                 <source>target/generated-sources/annotations</source>
                             </sourceDirs>
                         </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
                     </execution>
                 </executions>
                 <configuration>
                     <jvmTarget>8</jvmTarget>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <executions>
-                    <execution>
-                        <id>default-compile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>testCompile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-compiler-plugin</artifactId>-->
+<!--                <version>3.8.1</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>default-compile</id>-->
+<!--                        <phase>none</phase>-->
+<!--                    </execution>-->
+<!--                    <execution>-->
+<!--                        <id>default-testCompile</id>-->
+<!--                        <phase>none</phase>-->
+<!--                    </execution>-->
+<!--                    <execution>-->
+<!--                        <id>compile</id>-->
+<!--                        <phase>compile</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>compile</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <source>${java.version}</source>-->
+<!--                    <target>${java.version}</target>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
         </plugins>
         <resources>
             <resource>
@@ -133,32 +117,32 @@
         </dependency>
         <dependency>
             <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-main</artifactId>
+            <artifactId>swift-disguise-main</artifactId>
             <version>v1.3.0</version>
         </dependency>
         <dependency>
             <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-implementation-v1_8_R3</artifactId>
+            <artifactId>swift-disguise-implementation-v1_8_R3</artifactId>
             <version>v1.3.0</version>
         </dependency>
         <dependency>
             <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-implementation-v1_20_R3</artifactId>
+            <artifactId>swift-disguise-implementation-v1_20_R3</artifactId>
             <version>v1.3.0</version>
         </dependency>
         <dependency>
             <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-implementation-v1_20_R1</artifactId>
+            <artifactId>swift-disguise-implementation-v1_20_R1</artifactId>
             <version>v1.3.0</version>
         </dependency>
         <dependency>
             <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-dev</artifactId>
+            <artifactId>swift-disguise-dev</artifactId>
             <version>v1.3.0</version>
         </dependency>
         <dependency>
             <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-nms-common</artifactId>
+            <artifactId>swift-disguise-nms-common</artifactId>
             <version>v1.3.0</version>
         </dependency>
     </dependencies>

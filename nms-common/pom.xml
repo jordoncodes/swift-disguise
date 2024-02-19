@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.onlyjordon</groupId>
-    <artifactId>nicknamer-api-nms-common</artifactId>
+    <artifactId>swift-disguise-nms-common</artifactId>
     <version>v1.3.0</version>
     <packaging>jar</packaging>
 
-    <name>nicknamer-api-nms-common</name>
+    <name>swift-disguise-nms-common</name>
 
     <properties>
         <java.version>1.8</java.version>
@@ -128,7 +128,7 @@
         </dependency>
         <dependency>
             <groupId>me.onlyjordon</groupId>
-            <artifactId>nicknamer-api-main</artifactId>
+            <artifactId>swift-disguise-main</artifactId>
             <version>v1.3.0</version>
             <scope>provided</scope>
         </dependency>

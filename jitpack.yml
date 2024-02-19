@@ -1,4 +1,4 @@
 jdk:
   - openjdk8
 install:
-  - mvn clean package install -pl :nicknamer-api-main
+  - mvn clean package install -pl :swift-disguise-main

@@ -1,6 +1,6 @@
-name: nicknamer-api
+name: swift-disguise
 version: '1.3.0'
-main: me.onlyjordon.nicknamingapi.NicknamerAPI
+main: me.onlyjordon.swiftdisguise.api.SwiftDisguiseAPI
 load: STARTUP
 depend:
   - packetevents

@@ -26,9 +26,9 @@ Include the dependency in a maven project:
     <!-- other dependencies -->
     <dependency>
         <groupId>com.github.jordoncodes</groupId>
-        <artifactId>nicknamer-api</artifactId>
+        <artifactId>swift-disguise</artifactId>
         <version>v1.3.0</version>
-        <scope>provided</scope> <!-- without this, Nicknamer.getDisguiser() will give you null -->
+        <scope>provided</scope> <!-- without this, SwiftDisguiseAPI.getDisguiser() will give you null -->
     </dependency>
 </dependencies>
 ```
@@ -36,8 +36,8 @@ Include the dependency in a maven project:
 After that you can simply:
 
 ```java
-Nicknamer namer = NicknamerAPI.getNicknamer();
-new DisguiseBuilder(nicknamer)
+me.onlyjordon.swiftdisguise.api.Disguiser namer = SwiftDisguiseAPI.getDisguiser();
+new DisguiseBuilder(namer)
         .setNick("nickname")
         .setSkin("Notch")
         .setPrefixSuffix(Component.text(ChatColor.RED+"Prefix"), Component.text(ChatColor.GREEN+"Suffix"), ChatColor.WHITE, 0)
@@ -45,10 +45,10 @@ new DisguiseBuilder(nicknamer)
         .apply(player);
 ```
 
-You could also use the Nicknamer functions directly, rather than using a builder:
+You could also use the me.onlyjordon.swiftdisguise.api.Disguiser functions directly, rather than using a builder:
 ```java 
 // get the api
-Nicknamer disguiser = NicknamerAPI.getNicknamer();
+me.onlyjordon.swiftdisguise.api.Disguiser disguiser = SwiftDisguiseAPI.getDisguiser();
 
 // then call:
 disguiser.setNick(player, "nickname");
@@ -79,7 +79,7 @@ player.setSkinLayerVisible(player, SkinLayers.SkinLayer.CAPE, false) // hide cap
 player.refresh()
 ```
 
-You could also use Nicknamer-API to set prefixes and suffixes for players. This uses scoreboard team packets, and will put the prefix & suffix in the player nametag and in the tablist. Example:
+You could also use swift-disguise to set prefixes and suffixes for players. This uses scoreboard team packets, and will put the prefix & suffix in the player nametag and in the tablist. Example:
 ```java
 // set the prefix/suffix values:
 disguiser.setPrefixSuffix(player, Component.text(ChatColor.RED+"Prefix"), Component.text(ChatColor.GREEN+"Suffix"), ChatColor.WHITE, 0); // last param (int) is a priority in the tablist, higher priority = lower position in tablist.
@@ -122,8 +122,8 @@ force everyone's skin to be a certain skin:
 ```java
 @EventHandler
 public void onJoin(PlayerJoinEvent event) {
-    NicknamerAPI.getNicknamer().setSkin(event.getPlayer(), "Notch");
-    NicknamerAPI.getNicknamer().refreshPlayer(event.getPlayer());
+    SwiftDisguiseAPI.getDisguiser().setSkin(event.getPlayer(), "Notch");
+    SwiftDisguiseAPI.getDisguiser().refreshPlayer(event.getPlayer());
 }
 
 @EventHandler
@@ -132,12 +132,12 @@ public void onSkinChange(PlayerSkinChangeEvent event) {
 }
 ```
 
-and more in the `me.onlyjordon.nicknamingapi.events` package.
+and more in the `me.onlyjordon.swiftdisguise.events` package.
 
 # Errors
-## Null Nicknamer
-I'm getting a null nicknamer error? What do I do?
+## Null me.onlyjordon.swiftdisguise.api.Disguiser
+I'm getting a null me.onlyjordon.swiftdisguise.api.Disguiser error? What do I do?
 
-You probably have Nicknamer API in your jar. Try following [this](https://github.com/jordoncodes/nicknamer-api?tab=readme-ov-file#maven)
+You probably have the SwiftDisguiser API in your jar. Try following [this](https://github.com/jordoncodes/swift-disguise?tab=readme-ov-file#maven)
 
-If you're having another issue, and nothing is in console, you could try setting the environment variable NICKNAMER_DEV to true, and it will print out information in chat, and allow you to use `/nickdev`. 
+If you're having another issue, and nothing is in console, you could try setting the environment variable SWIFTDISGUISE_DEV to true, and it will print out information in chat, and allow you to use `/nickdev`. 
