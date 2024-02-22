@@ -1,8 +1,6 @@
 package me.onlyjordon.swiftdisguise.api;
 
-import me.onlyjordon.swiftdisguise.api.IDisguiseData;
-import me.onlyjordon.swiftdisguise.api.IDisguiser;
-import me.onlyjordon.swiftdisguise.api.SwiftDisguiseAPI;
+import me.onlyjordon.swiftdisguise.api.disguise.IDisguiseData;
 import me.onlyjordon.swiftdisguise.api.events.*;
 import me.onlyjordon.swiftdisguise.api.utils.Skin;
 import me.onlyjordon.swiftdisguise.api.utils.SkinLayers;
@@ -15,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
+import java.util.UUID;
 
 public class Disguiser {
 
@@ -193,5 +192,21 @@ public class Disguiser {
 
     protected IDisguiser getImplementation() {
         return nicknamerImpl;
+    }
+
+    public void setSkinLayers(Player player, SkinLayers layers) {
+        nicknamerImpl.setSkinLayers(player, layers);
+    }
+
+    public Skin getOriginalSkin(Player player) {
+        IDisguiseData data = nicknamerImpl.getData(player);
+        if (data == null) return null;
+        return data.getOriginalSkin();
+    }
+
+    public UUID getFakeUUID(Player realPlayer) {
+        IDisguiseData data = nicknamerImpl.getData(realPlayer);
+        if (data == null) return UUID.randomUUID();
+        return data.getFakeUUID();
     }
 }

@@ -1,6 +1,5 @@
 package me.onlyjordon.swiftdisguise.nms.v1_8_R3.util
 
-import me.onlyjordon.swiftdisguise.api.PlayerExtensions.Companion.getNick
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.event.PacketListener
 import com.github.retrooper.packetevents.event.PacketListenerPriority
@@ -15,8 +14,9 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnPlayer
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
-import me.onlyjordon.swiftdisguise.api.DisguiseData
 import me.onlyjordon.swiftdisguise.api.IDisguiser
+import me.onlyjordon.swiftdisguise.api.PlayerExtensions.Companion.getNick
+import me.onlyjordon.swiftdisguise.api.disguise.DisguiseData
 import me.onlyjordon.swiftdisguise.api.events.PlayerSkinLayerChangeEvent
 import me.onlyjordon.swiftdisguise.api.utils.ReflectionHelper
 import me.onlyjordon.swiftdisguise.api.utils.Skin
@@ -107,7 +107,9 @@ class Disguiser : PacketListener,Listener, IDisguiser() {
             Component.text(""),
             Component.text(""),
             null,
-            UUID.randomUUID()
+            UUID.randomUUID(),
+            ChatColor.WHITE,
+            0
         )
         prefixSuffix.values.forEach {
             player.handle.playerConnection.sendPacket(it)

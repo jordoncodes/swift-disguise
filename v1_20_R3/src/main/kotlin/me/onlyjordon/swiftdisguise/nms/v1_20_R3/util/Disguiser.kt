@@ -1,6 +1,5 @@
 package me.onlyjordon.swiftdisguise.nms.v1_20_R3.util
 
-import me.onlyjordon.swiftdisguise.api.PlayerExtensions.Companion.refresh
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.event.PacketListener
 import com.github.retrooper.packetevents.event.PacketListenerPriority
@@ -16,8 +15,10 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity
 import com.mojang.authlib.properties.Property
 import io.netty.buffer.Unpooled
-import me.onlyjordon.swiftdisguise.api.DisguiseData
 import me.onlyjordon.swiftdisguise.api.IDisguiser
+import me.onlyjordon.swiftdisguise.api.PlayerConverter
+import me.onlyjordon.swiftdisguise.api.PlayerExtensions.Companion.refresh
+import me.onlyjordon.swiftdisguise.api.disguise.DisguiseData
 import me.onlyjordon.swiftdisguise.api.events.PlayerSkinLayerChangeEvent
 import me.onlyjordon.swiftdisguise.api.utils.ReflectionHelper
 import me.onlyjordon.swiftdisguise.api.utils.Skin
@@ -108,7 +109,7 @@ class Disguiser: Listener,PacketListener, IDisguiser() {
         if (event.packetType == PacketType.Play.Server.PLAYER_INFO_UPDATE) {
             val packet = WrapperPlayServerPlayerInfoUpdate(event)
             packet.entries.forEach {
-                changeProfile(it.gameProfile, !(event.player is Player && it.gameProfile.uuid == (event.player as Player).uniqueId))
+                changeProfile(it.gameProfile, (event.player is Player && it.gameProfile.uuid == (event.player as Player).uniqueId))
             }
         }
         if (event.packetType == PacketType.Play.Server.PLAYER_INFO_REMOVE) {
@@ -153,6 +154,8 @@ class Disguiser: Listener,PacketListener, IDisguiser() {
         if (event.player !is Player) return
         val player = event.player as Player
         if (event.packetType == PacketType.Play.Client.CLIENT_SETTINGS) {
+            val profile = PlayerConverter.fromBukkitPlayer(player)
+            println("Name: ${profile.name} UUID: ${profile.uuid} Skin: ${profile.textureProperties.firstOrNull()?.value}}")
             val packet = WrapperPlayClientSettings(event)
             val e = PlayerSkinLayerChangeEvent(player, data[player.uniqueId]?.skinLayers, SkinLayers.getFromRaw(packet.visibleSkinSectionMask), PlayerSkinLayerChangeEvent.Reason.PLAYER)
             Bukkit.getPluginManager().callEvent(e)
@@ -165,7 +168,7 @@ class Disguiser: Listener,PacketListener, IDisguiser() {
         }
     }
 
-    private fun changeProfile(profile: UserProfile, hideUUID: Boolean = true) {
+    private fun changeProfile(profile: UserProfile, isSamePlayer: Boolean) {
         val uuid = profile.uuid
         val other = Bukkit.getOfflinePlayer(uuid)
         if (!other.isOnline) return
@@ -173,12 +176,13 @@ class Disguiser: Listener,PacketListener, IDisguiser() {
         val data = data[uuid] ?: return
         val id = getFakeUUID(other)
         profile.name = data.nickname ?: other.name
-        if (hideUUID) profile.uuid = id // fake uuid
+        if (!isSamePlayer) profile.uuid = id // fake uuid
         val skin = data.currentSkin ?: data.originalSkin ?: Skin(
             null,
             null
         )
         profile.textureProperties = listOf(TextureProperty("textures", skin.value, skin.signature))
+        if (isSamePlayer) profile.name = other.name
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -203,11 +207,14 @@ class Disguiser: Listener,PacketListener, IDisguiser() {
             net.kyori.adventure.text.Component.text(""),
             net.kyori.adventure.text.Component.text(""),
             SkinLayers.getFromRaw(rawLayers),
-            getFakeUUID(player)
+            getFakeUUID(player),
+            ChatColor.WHITE,
+            0
         )
         prefixSuffix.values.forEach {
             player.handle.connection.send(it)
         }
+
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -308,6 +315,10 @@ class Disguiser: Listener,PacketListener, IDisguiser() {
 
     override fun setNick(player: Player, nick: String) {
         val data = data[player.uniqueId] ?: return
+        (player as CraftPlayer).profile.name
+        val f = ReflectionHelper.getField("name", player.profile)
+        f.isAccessible = true
+        f.set(player.profile, nick)
         data.nickname = nick
     }
 

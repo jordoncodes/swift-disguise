@@ -1,6 +1,5 @@
 package me.onlyjordon.swiftdisguise.nms.v1_20_R1.util
 
-import me.onlyjordon.swiftdisguise.api.PlayerExtensions.Companion.refresh
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.event.PacketListener
 import com.github.retrooper.packetevents.event.PacketListenerPriority
@@ -16,13 +15,14 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnPlayer
 import com.mojang.authlib.properties.Property
 import io.netty.buffer.Unpooled
-import me.onlyjordon.swiftdisguise.api.DisguiseData
 import me.onlyjordon.swiftdisguise.api.IDisguiser
+import me.onlyjordon.swiftdisguise.api.PlayerExtensions.Companion.refresh
+import me.onlyjordon.swiftdisguise.api.disguise.DisguiseData
 import me.onlyjordon.swiftdisguise.api.events.PlayerSkinLayerChangeEvent
-import me.onlyjordon.swiftdisguise.api.utils.Utils
 import me.onlyjordon.swiftdisguise.api.utils.ReflectionHelper
 import me.onlyjordon.swiftdisguise.api.utils.Skin
 import me.onlyjordon.swiftdisguise.api.utils.SkinLayers
+import me.onlyjordon.swiftdisguise.api.utils.Utils
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer
 import net.minecraft.ChatFormatting
@@ -204,7 +204,9 @@ class Disguiser: Listener,PacketListener, IDisguiser() {
             net.kyori.adventure.text.Component.text(""),
             net.kyori.adventure.text.Component.text(""),
             SkinLayers.getFromRaw(rawLayers),
-            getFakeUUID(player)
+            getFakeUUID(player),
+            ChatColor.WHITE,
+            0
         )
         prefixSuffix.values.forEach {
             player.handle.connection.send(it)

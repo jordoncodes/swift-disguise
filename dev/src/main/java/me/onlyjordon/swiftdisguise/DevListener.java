@@ -1,9 +1,11 @@
 package me.onlyjordon.swiftdisguise;
 
+import me.onlyjordon.swiftdisguise.api.SwiftDisguiseAPI;
 import me.onlyjordon.swiftdisguise.api.events.*;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import java.util.Objects;
 

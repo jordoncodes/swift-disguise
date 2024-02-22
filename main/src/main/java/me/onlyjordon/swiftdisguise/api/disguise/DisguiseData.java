@@ -1,8 +1,9 @@
-package me.onlyjordon.swiftdisguise.api;
+package me.onlyjordon.swiftdisguise.api.disguise;
 
 import me.onlyjordon.swiftdisguise.api.utils.Skin;
 import me.onlyjordon.swiftdisguise.api.utils.SkinLayers;
 import net.kyori.adventure.text.TextComponent;
+import org.bukkit.ChatColor;
 
 import java.util.UUID;
 
@@ -10,12 +11,16 @@ public class DisguiseData implements IDisguiseData {
     private Skin originalSkin;
     private Skin currentSkin;
     private String nickname;
+
     private TextComponent prefix;
     private TextComponent suffix;
+    private ChatColor prefixSuffixColor;
+    private int tabPriority;
+
     private SkinLayers skinLayers;
     private UUID fakeUUID;
 
-    public DisguiseData(Skin originalSkin, String nickname, TextComponent prefix, TextComponent suffix, SkinLayers skinLayers, UUID fakeUUID) {
+    public DisguiseData(Skin originalSkin, String nickname, TextComponent prefix, TextComponent suffix, SkinLayers skinLayers, UUID fakeUUID, ChatColor prefixSuffixColor, int tabPriority) {
         this.originalSkin = originalSkin;
         this.nickname = nickname;
         this.prefix = prefix;
@@ -23,6 +28,26 @@ public class DisguiseData implements IDisguiseData {
         this.skinLayers = skinLayers;
         this.fakeUUID = fakeUUID;
         this.currentSkin = null;
+        this.prefixSuffixColor = prefixSuffixColor;
+        this.tabPriority = tabPriority;
+    }
+
+    @Override
+    public ChatColor getPrefixSuffixColor() {
+        return prefixSuffixColor;
+    }
+
+    @Override
+    public int getTabPriority() {
+        return tabPriority;
+    }
+
+    public void setPrefixSuffixColor(ChatColor prefixSuffixColor) {
+        this.prefixSuffixColor = prefixSuffixColor;
+    }
+
+    public void setTabPriority(int tabPriority) {
+        this.tabPriority = tabPriority;
     }
 
     @Override

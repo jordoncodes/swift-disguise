@@ -2,10 +2,12 @@ package me.onlyjordon.swiftdisguise.debug
 
 import me.onlyjordon.swiftdisguise.api.DisguiseBuilder
 import me.onlyjordon.swiftdisguise.api.SwiftDisguiseAPI
-import me.onlyjordon.swiftdisguise.commands.PlayerOnlyCommand
 import me.onlyjordon.swiftdisguise.api.utils.SkinLayers
+import me.onlyjordon.swiftdisguise.api.wrapper.PlayerDisguiseWrapper
+import me.onlyjordon.swiftdisguise.commands.PlayerOnlyCommand
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.util.concurrent.ThreadLocalRandom
@@ -22,14 +24,13 @@ class CommandDev : PlayerOnlyCommand("nickdev", "swiftdisguise.dev") {
             if ("nick".equals(args[0], ignoreCase = true)) {
                 player.sendMessage("Set nick to " + args[1])
                 SwiftDisguiseAPI.getDisguiser().setNick(player, args[1])
+                SwiftDisguiseAPI.getDisguiser().refreshPlayer(player)
                 return true
             }
             if ("nickandskin".equals(args[0], ignoreCase = true)) {
-                player.sendMessage("Setting skin and nick...")
-                SwiftDisguiseAPI.getDisguiser().setSkin(player, args[1])
                 SwiftDisguiseAPI.getDisguiser().setNick(player, args[1])
-                player.sendMessage("Skin and nick set!")
-                SwiftDisguiseAPI.getDisguiser().refreshPlayer(player)
+                SwiftDisguiseAPI.getDisguiser().setSkin(player, args[1])
+                player.sendMessage("Skin and nick are being set!")
                 return true
             }
         }
@@ -52,16 +53,23 @@ class CommandDev : PlayerOnlyCommand("nickdev", "swiftdisguise.dev") {
                 player.sendMessage("Skin layers set!")
                 return true
             }
+            if ("builder".equals(args[0], ignoreCase = true)) {
+                DisguiseBuilder(SwiftDisguiseAPI.getDisguiser())
+                    .setNick("example")
+                    .setSkin("phoave")
+                    .setPrefixSuffix("Admin ", " Test")
+                    .setSkinLayerVisible(SkinLayers.SkinLayer.CAPE, false)
+                    .apply(player)
+            }
+            if ("wrapper".equals(args[0], ignoreCase = true)) {
+                val wrapper = PlayerDisguiseWrapper.of(player)
+                wrapper.disguiseAsSync("example")
+                wrapper.setPrefixSuffix(Component.text("Prefix ").color { TextColor.color(0xff0000).value() }, Component.text(" Suffix").color { TextColor.color(0xff0000).value() }, ChatColor.WHITE, 1_000_000)
+                wrapper.refreshPlayer()
+                player.sendMessage("real name is ${wrapper.realName}; disguised as ${wrapper.nick} with prefix \"${LegacyComponentSerializer.legacySection().serialize(wrapper.prefix)}\" and suffix \"${LegacyComponentSerializer.legacySection().serialize(wrapper.suffix)}\"")
+            }
+        }
 
-        }
-        if ("builder".equals(args[0], ignoreCase = true)) {
-            DisguiseBuilder(SwiftDisguiseAPI.getDisguiser())
-                .setNick("example")
-                .setSkin("phoave")
-                .setPrefixSuffix("Admin ", " Test")
-                .setSkinLayerVisible(SkinLayers.SkinLayer.CAPE, false)
-                .apply(player)
-        }
         return false
     }
 

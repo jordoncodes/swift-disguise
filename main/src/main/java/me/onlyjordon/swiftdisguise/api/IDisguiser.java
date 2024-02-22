@@ -1,5 +1,7 @@
 package me.onlyjordon.swiftdisguise.api;
 
+import me.onlyjordon.swiftdisguise.api.disguise.DisguiseData;
+import me.onlyjordon.swiftdisguise.api.disguise.IDisguiseData;
 import me.onlyjordon.swiftdisguise.api.utils.Skin;
 import me.onlyjordon.swiftdisguise.api.utils.SkinLayers;
 import net.kyori.adventure.text.TextComponent;
