@@ -67,7 +67,7 @@ public final class SwiftDisguiseAPI extends JavaPlugin implements Listener {
 
     public static Disguiser getDisguiser() {
         if (disguiser == null) {
-            throw new NullPointerException("Null me.onlyjordon.swiftdisguise.api.Disguiser! SwiftDisguiseAPI hasn't loaded, check https://github.com/jordoncodes/swift-disguise?tab=readme-ov-file#null-disguiser on how to fix.");
+            throw new NullPointerException("Null Disguiser! SwiftDisguiseAPI hasn't loaded, check https://github.com/jordoncodes/swift-disguise?tab=readme-ov-file#null-disguiser on how to fix.");
         }
         return disguiser;
     }

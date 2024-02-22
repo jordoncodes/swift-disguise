@@ -132,11 +132,11 @@ public void onSkinChange(PlayerSkinChangeEvent event) {
 }
 ```
 
-and more in the `me.onlyjordon.swiftdisguise.events` package.
+and more in the `me.onlyjordon.swiftdisguise.api.events` package.
 
 # Errors
-## Null me.onlyjordon.swiftdisguise.api.Disguiser
-I'm getting a null me.onlyjordon.swiftdisguise.api.Disguiser error? What do I do?
+## Null Disguiser
+I'm getting a null Disguiser error? What do I do?
 
 You probably have the SwiftDisguiser API in your jar. Try following [this](https://github.com/jordoncodes/swift-disguise?tab=readme-ov-file#maven)
 

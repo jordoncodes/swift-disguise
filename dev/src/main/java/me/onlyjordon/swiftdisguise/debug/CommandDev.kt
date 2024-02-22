@@ -10,7 +10,7 @@ import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.util.concurrent.ThreadLocalRandom
 
-class CommandDev : PlayerOnlyCommand("nickdev", "nicknamerapi.dev") {
+class CommandDev : PlayerOnlyCommand("nickdev", "swiftdisguise.dev") {
     override fun execute(player: Player, args: Array<String>): Boolean {
         if (args.size >= 2) {
             if ("skin".equals(args[0], ignoreCase = true)) {
@@ -73,6 +73,7 @@ class CommandDev : PlayerOnlyCommand("nickdev", "nicknamerapi.dev") {
             put("refresh", 0)
             put("prefixsuffix", 0)
             put("skinlayers", 0)
+            put("builder", 0)
             put("example", 1)
 
         }
