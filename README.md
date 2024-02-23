@@ -36,7 +36,7 @@ Include the dependency in a maven project:
 After that you can simply:
 
 ```java
-me.onlyjordon.swiftdisguise.api.Disguiser namer = SwiftDisguiseAPI.getDisguiser();
+Disguiser namer = SwiftDisguiseAPI.getDisguiser();
 new DisguiseBuilder(namer)
         .setNick("nickname")
         .setSkin("Notch")
@@ -45,10 +45,10 @@ new DisguiseBuilder(namer)
         .apply(player);
 ```
 
-You could also use the me.onlyjordon.swiftdisguise.api.Disguiser functions directly, rather than using a builder:
+You could also use the Disguiser functions directly, rather than using a builder:
 ```java 
 // get the api
-me.onlyjordon.swiftdisguise.api.Disguiser disguiser = SwiftDisguiseAPI.getDisguiser();
+Disguiser disguiser = SwiftDisguiseAPI.getDisguiser();
 
 // then call:
 disguiser.setNick(player, "nickname");
