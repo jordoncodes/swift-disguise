@@ -1,0 +1,8 @@
+name: "SwiftDisguise-test"
+main: "me.onlyjordon.swiftdisguise.Main"
+version: "2.0.0"
+author: "onlyjordon"
+depend: [
+  "packetevents",
+  "SwiftDisguise"
+]
