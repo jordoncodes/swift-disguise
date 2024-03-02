@@ -15,7 +15,7 @@ dependencies {
 
 tasks {
     runServer {
-        minecraftVersion("1.20.4")
+        minecraftVersion("1.8.8")
         downloadPlugins {
             modrinth("packetevents", "2.2.1")
         }

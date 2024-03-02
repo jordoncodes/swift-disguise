@@ -59,7 +59,7 @@ public class SwiftDisguiseSpigot extends SwiftDisguiseAPI {
             refresher.refreshPlayer(player, false);
         }
         if (old == null || !old.skinLayersEquals(getDisguiseData(player))) {
-            refresher.refreshSkinLayers(player);
+//            refresher.refreshSkinLayers(player);
         }
         oldData.put(player, ((DisguiseData)getDisguiseData(player)).copy());
     }

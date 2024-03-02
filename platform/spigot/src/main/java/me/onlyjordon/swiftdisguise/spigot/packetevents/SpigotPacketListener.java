@@ -130,6 +130,7 @@ public class SpigotPacketListener implements PacketListener {
     }
 
     private void handlePlayerInfoPacket(Player receiver, WrapperPlayServerPlayerInfo wrapper) {
+        if (wrapper.getPlayerDataList() == null) return;
         wrapper.getPlayerDataList().forEach(playerData -> {
             Player player = Bukkit.getPlayer(playerData.getUserProfile().getUUID());
             if (player == null) return;

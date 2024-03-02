@@ -44,7 +44,7 @@ public class Plugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         ISwiftDisguiseAPI disguise = SwiftDisguise.getAPI(SpigotPlatform.get());
-        disguise.refreshPlayer(event.getPlayer());
+//        disguise.refreshPlayer(event.getPlayer());
     }
 
     @EventHandler

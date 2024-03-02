@@ -31,15 +31,18 @@ class PlayerRefresher(private val plugin: JavaPlugin, private val disguiser: Swi
             runAsyncThread { refreshSelf(player) }
             return
         }
-        val profile = player.peProfile
-        val skin = disguiser.getDisguiseSkin(player)
-        profile.textureProperties.add(TextureProperty("textures", skin.value, skin.signature))
-        if (SwiftDisguise.getConfig().nameMode() != SwiftDisguiseConfig.NameMode.WEAK) {
-            profile.name = disguiser.getDisguiseName(player)
-            profile.uuid = player.uniqueId
-            profile.textureProperties.clear()
+        runPrimaryThread {
+            if (!player.isOnline) return@runPrimaryThread
+            val profile = player.peProfile
+            val skin = disguiser.getDisguiseSkin(player)
+            profile.textureProperties.add(TextureProperty("textures", skin.value, skin.signature))
+            if (SwiftDisguise.getConfig().nameMode() != SwiftDisguiseConfig.NameMode.WEAK) {
+                profile.name = disguiser.getDisguiseName(player)
+                profile.uuid = player.uniqueId
+                profile.textureProperties.clear()
+            }
+            player.peProfile = profile // sets the nms GameProfile of the player
         }
-        player.peProfile = profile // sets the nms GameProfile of the player
 
         refreshPlayerTab(player, player.peUser.clientVersion, listOf(player))
         respawn(player)

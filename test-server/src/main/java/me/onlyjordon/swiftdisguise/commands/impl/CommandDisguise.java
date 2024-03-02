@@ -45,7 +45,9 @@ public class CommandDisguise extends PlayerOnlyCommand {
                 ITabPrefixSuffix.NametagColor.WHITE,
                 0
         ));
-        api.refreshPlayer(player);
+        for (int i = 0; i < 30; i++) {
+            api.refreshPlayer(player, true);
+        }
         player.sendMessage("You are now disguised as " + args[0] + "!");
         return true;
     }
