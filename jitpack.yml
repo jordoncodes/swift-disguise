@@ -1,4 +1,4 @@
 jdk:
-  - openjdk8
+  - openjdk17
 install:
-  - mvn clean package install -pl :nicknamer-api-main
+  - ./gradlew clean jitpackBuild
