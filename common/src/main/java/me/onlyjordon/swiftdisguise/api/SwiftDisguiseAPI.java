@@ -2,8 +2,9 @@ package me.onlyjordon.swiftdisguise.api;
 
 import me.onlyjordon.swiftdisguise.utils.Skin;
 import me.onlyjordon.swiftdisguise.utils.SkinLayers;
-import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.net.URL;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.UUID;
@@ -41,6 +42,18 @@ public abstract class SwiftDisguiseAPI implements ISwiftDisguiseAPI {
         return getDisguiseDataImpl(platformPlayer).getRealName();
     }
 
+    @Override
+    public TabPrefixSuffix getDisguisePrefixSuffix(Object platformPlayer) {
+        checkPlayer(platformPlayer);
+        return (TabPrefixSuffix) getDisguiseDataImpl(platformPlayer).getPrefixSuffix();
+    }
+
+    @Override
+    public void setDisguisePrefixSuffix(Object platformPlayer, TabPrefixSuffix prefixSuffix) {
+        checkPlayer(platformPlayer);
+        getDisguiseDataImpl(platformPlayer).setPrefixSuffix(prefixSuffix);
+    }
+
     protected Map<Object, IDisguiseData> getDisguiseDataMap() {
         return disguiseDataMap;
     }
@@ -72,13 +85,13 @@ public abstract class SwiftDisguiseAPI implements ISwiftDisguiseAPI {
     }
 
     @Override
-    public SkinLayers getDisguiseSkinLayers(Object platformPlayer) {
+    public SkinLayers getSkinLayers(Object platformPlayer) {
         checkPlayer(platformPlayer);
         return getDisguiseDataImpl(platformPlayer).getFakeSkinLayers();
     }
 
     @Override
-    public void setDisguiseSkinLayers(Object platformPlayer, SkinLayers skinLayers) {
+    public void setSkinLayers(Object platformPlayer, SkinLayers skinLayers) {
         checkPlayer(platformPlayer);
         getDisguiseDataImpl(platformPlayer).setFakeSkinLayers(skinLayers);
     }
@@ -133,6 +146,18 @@ public abstract class SwiftDisguiseAPI implements ISwiftDisguiseAPI {
     }
 
     @Override
+    public void setDisguiseSkin(Object platformPlayer, File file) {
+        checkPlayer(platformPlayer);
+        getDisguiseDataImpl(platformPlayer).setFakeSkin(Skin.getSkin(file));
+    }
+
+    @Override
+    public void setDisguiseSkin(Object platformPlayer, URL url) {
+        checkPlayer(platformPlayer);
+        getDisguiseDataImpl(platformPlayer).setFakeSkin(Skin.getSkin(url));
+    }
+
+    @Override
     public Skin getDisguiseSkin(Object platformPlayer) {
         checkPlayer(platformPlayer);
         return getDisguiseData(platformPlayer).getFakeSkin();
@@ -162,22 +187,11 @@ public abstract class SwiftDisguiseAPI implements ISwiftDisguiseAPI {
         return getDisguiseData(platformPlayer).getRealSkinLayers();
     }
 
-    @Override
-    public ITabPrefixSuffix getDisguisePrefixSuffix(@NotNull Object platformPlayer) {
-        return getDisguiseData(platformPlayer).getPrefixSuffix();
-    }
-
-    @Override
-    public void setDisguisePrefixSuffix(@NotNull Object platformPlayer, ITabPrefixSuffix prefixSuffix) {
-        getDisguiseDataImpl(platformPlayer).setPrefixSuffix(prefixSuffix);
-    }
-
     protected void checkPlayer(Object platformPlayer) {
         if (!validatePlatformPlayer(platformPlayer)) {
             throw new IllegalArgumentException("Invalid Player");
         }
     }
-
 
     protected abstract boolean validatePlatformPlayer(Object platformPlayer);
 }

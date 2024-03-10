@@ -1,9 +1,8 @@
-package me.onlyjordon.swiftdisguise.spigot
+package me.onlyjordon.swiftdisguise
 
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.manager.server.ServerVersion
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData
-import com.github.retrooper.packetevents.protocol.entity.data.EntityDataType
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes
 import com.github.retrooper.packetevents.protocol.player.ClientVersion
 import com.github.retrooper.packetevents.protocol.player.GameMode
@@ -13,22 +12,16 @@ import com.github.retrooper.packetevents.protocol.world.Difficulty
 import com.github.retrooper.packetevents.protocol.world.Dimension
 import com.github.retrooper.packetevents.protocol.world.Location
 import com.github.retrooper.packetevents.wrapper.PacketWrapper
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChangeGameState
+import com.github.retrooper.packetevents.wrapper.play.server.*
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChangeGameState.Reason
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoRemove
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRespawn
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnPlayer
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
-import me.onlyjordon.swiftdisguise.spigot.nms.CrossVersionPlayerHelper
+import me.onlyjordon.swiftdisguise.nms.CrossVersionPlayerHelper
+import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.World.Environment
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import java.util.EnumSet
 
 open class PacketExtensions {
     protected fun Player.sendPacket(packet: PacketWrapper<*>?) {
@@ -42,13 +35,10 @@ open class PacketExtensions {
     protected var Player.peProfile: UserProfile
         get() = peUser.profile
         set(value) {
-            val profile = peUser.profile
-            profile.name = value.name
-            profile.uuid = value.uuid
-            profile.textureProperties.clear()
-            profile.textureProperties.addAll(value.textureProperties)
-            CrossVersionPlayerHelper.setGameProfile(player, profile)
-            CrossVersionPlayerHelper.updateNameOnServer(value.name, player)
+            peUser.profile.name = value.name
+            peUser.profile.uuid = value.uuid
+            peUser.profile.textureProperties.clear()
+            peUser.profile.textureProperties.addAll(value.textureProperties)
         }
 
     protected var Player.peGameMode: GameMode
@@ -76,9 +66,6 @@ open class PacketExtensions {
         return peDimension
     }
 
-    protected val Player.metadataPacket: WrapperPlayServerEntityMetadata
-        get() = WrapperPlayServerEntityMetadata(entityId, listOf(EntityData(CrossVersionPlayerHelper.getSkinLayersIndex(PacketEvents.getAPI().serverManager.version), EntityDataTypes.BYTE, 0.toByte()))) // the 0 will be replaced with the correct value in SpigotPacketListener
-
     private fun setDimension(env: Environment, dim: Dimension) {
         when (env) {
             Environment.NETHER -> dim.dimensionName = "the_nether"
@@ -89,7 +76,7 @@ open class PacketExtensions {
     }
 
     private val World.peDimension: Dimension
-        get() = try { SpigotConversionUtil.fromBukkitWorld(this) } catch (e: Exception) { Dimension(0) } // need to catch exceptions, because SpigotConversionUtil breaks on some versions
+        get() = SpigotConversionUtil.fromBukkitWorld(this)
 
     protected val Player.peDimension: Dimension
         get() = getDimension(this)
@@ -133,7 +120,7 @@ open class PacketExtensions {
 
     protected val Player.modernPlayerInfoAddPacket: PacketWrapper<*>
         get() = WrapperPlayServerPlayerInfoUpdate(
-            WrapperPlayServerPlayerInfoUpdate.Action.ADD_PLAYER, WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
+            EnumSet.allOf(WrapperPlayServerPlayerInfoUpdate.Action::class.java), WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
                 peProfile, true, pingInMs, peGameMode, null, null
             )
         )
@@ -164,6 +151,10 @@ open class PacketExtensions {
             0
         )
 
+    protected val Player.metadataPacket: WrapperPlayServerEntityMetadata
+        get() = WrapperPlayServerEntityMetadata(entityId, listOf(EntityData(CrossVersionPlayerHelper.getSkinLayersIndex(PacketEvents.getAPI().serverManager.version), EntityDataTypes.BYTE, 0.toByte()))) // the 0 will be replaced with the correct value in SpigotPacketListener
+
+
     protected val Entity.deleteEntityPacket: PacketWrapper<*>
         get() = WrapperPlayServerDestroyEntities(entityId)
 
@@ -175,6 +166,18 @@ open class PacketExtensions {
 
     protected val Player.teleportPacket: PacketWrapper<*>
         get() = WrapperPlayServerEntityTeleport(entityId, peLocation, isOnGround)
+
+    private fun getAnyOtherWorld(world: World): World {
+        return Bukkit.getWorlds().firstOrNull { it.uid != world.uid } ?: world
+    }
+
+    protected fun Player.teleportToOtherDimensionAndBack() {
+        val loc = location
+        val otherDimLoc = loc.clone();
+        otherDimLoc.world = getAnyOtherWorld(world)
+        teleport(otherDimLoc)
+        teleport(loc)
+    }
 
     protected val refreshChunksPacket: PacketWrapper<*>
         get() = WrapperPlayServerChangeGameState(Reason.START_LOADING_CHUNKS, 0f)

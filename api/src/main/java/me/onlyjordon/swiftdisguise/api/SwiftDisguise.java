@@ -1,6 +1,5 @@
 package me.onlyjordon.swiftdisguise.api;
 
-import me.onlyjordon.swiftdisguise.platforms.IPlatform;
 import me.onlyjordon.swiftdisguise.platforms.Platform;
 
 

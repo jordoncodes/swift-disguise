@@ -1,4 +1,4 @@
-package me.onlyjordon.swiftdisguise.spigot.events;
+package me.onlyjordon.swiftdisguise.events;
 
 import me.onlyjordon.swiftdisguise.utils.SkinLayers;
 import org.bukkit.Bukkit;

@@ -6,5 +6,5 @@ include("common")
 include("api")
 include("platform:spigot")
 if (!(System.getenv("JITPACK")).toBoolean()) {
-    include("test-server")
+    include("test-server-1.20.4")
 }

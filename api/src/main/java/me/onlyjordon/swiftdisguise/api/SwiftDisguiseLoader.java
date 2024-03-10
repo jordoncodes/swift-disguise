@@ -1,5 +1,6 @@
 package me.onlyjordon.swiftdisguise.api;
 
+import me.onlyjordon.swiftdisguise.utils.Util;
 import org.bspfsystems.yamlconfiguration.file.YamlConfiguration;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -29,8 +30,9 @@ public class SwiftDisguiseLoader {
         return yamlConfig;
     }
 
-    public static void load(File configFile) {
-        SwiftDisguiseLoader.configFile = configFile;
+    @ApiStatus.Internal
+    public static void load() {
+        configFile = new File(Util.getDataFolder().getAbsolutePath() + File.separator + "config.yml");
         if (!configFile.exists()) {
             if (!configFile.getParentFile().exists()) {
                 configFile.getParentFile().mkdirs();
@@ -97,7 +99,7 @@ public class SwiftDisguiseLoader {
         List<String> nameModeComments = new ArrayList<>();
         nameModeComments.add("The mode to use for player names");
         nameModeComments.add("WEAK - The server will think the player's name is their real name - commands will be the same as if they weren't nicked");
-        nameModeComments.add("STRONG - less compatibility, can have issues as the server thinks your name is the nickname, tab completion + commands show nickname (commands don't work with nickname)");
+        nameModeComments.add("STRONG - less compatibility, can have issues as the server thinks your name is the nickname, tab completion + commands show nickname (commands sometimes work with nicknames)");
         return nameModeComments;
     }
 }

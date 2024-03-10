@@ -8,6 +8,8 @@ import java.util.UUID;
 
 public interface IDisguiseData {
 
+    ITabPrefixSuffix getPrefixSuffix();
+
     UUID getFakeUUID();
 
     Object getDisguisedAsEntity();
@@ -21,8 +23,6 @@ public interface IDisguiseData {
     String getRealName();
 
     UUID getRealUUID();
-
-    ITabPrefixSuffix getPrefixSuffix();
 
     SkinLayers getFakeSkinLayers();
 

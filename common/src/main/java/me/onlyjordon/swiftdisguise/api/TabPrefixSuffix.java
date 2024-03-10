@@ -1,5 +1,6 @@
 package me.onlyjordon.swiftdisguise.api;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 
 public class TabPrefixSuffix implements ITabPrefixSuffix {
@@ -9,6 +10,13 @@ public class TabPrefixSuffix implements ITabPrefixSuffix {
         this.suffix = suffix;
         this.color = color;
         this.priority = priority;
+    }
+
+    public TabPrefixSuffix() {
+        this.prefix = Component.text("");
+        this.suffix = Component.text("");
+        this.color = NametagColor.WHITE;
+        this.priority = 0;
     }
 
     private TextComponent prefix, suffix;

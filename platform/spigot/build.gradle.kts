@@ -1,6 +1,6 @@
 plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "1.9.23"
 }
 
 repositories {
@@ -13,12 +13,8 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":api"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
-    implementation("org.bspfsystems:yamlconfiguration:2.0.1")
-    implementation("org.yaml:snakeyaml:2.2")
-
     compileOnlyApi("com.github.retrooper.packetevents:spigot:2.2.1")
-    compileOnlyApi("net.kyori:adventure-platform-bukkit:${project.ext.get("adventureBukkitVersion")}")
-
+    implementation("org.bspfsystems:yamlconfiguration:2.0.1")
     compileOnly("com.viaversion:viabackwards-common:4.9.2-SNAPSHOT") {
         isTransitive = false
     }
@@ -45,11 +41,23 @@ tasks {
         relocate("org.yaml", "me.onlyjordon.swiftdisguise.libs.yaml")
     }
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+            from(components["java"])
+        }
+    }
+}
+
 tasks.build.get().finalizedBy(tasks.shadowJar.get())
 
 tasks.register("copyJars", Copy::class) {
     from(tasks.shadowJar.get().destinationDirectory.get())
-    into(file("${project.rootDir}/test-server/run/plugins/"))
+    into(file("${project.rootDir}/test-server-1.20.4/run/plugins/"))
     exclude("${project.name}-${project.version}-javadoc.jar")
     exclude("${project.name}-${project.version}-${tasks.jar.get().archiveClassifier.get()}.jar")
     exclude("${project.name}-${project.version}-sources.jar")

@@ -15,9 +15,12 @@ dependencies {
 
 tasks {
     runServer {
-        minecraftVersion("1.8.8")
+        minecraftVersion("1.20.4")
         downloadPlugins {
             modrinth("packetevents", "2.2.1")
+            hangar("ViaVersion", "4.9.4-SNAPSHOT+276")
+            hangar("ViaBackwards", "4.9.3-SNAPSHOT+150")
+            hangar("ViaRewind", "3.0.7-SNAPSHOT+108")
         }
     }
 

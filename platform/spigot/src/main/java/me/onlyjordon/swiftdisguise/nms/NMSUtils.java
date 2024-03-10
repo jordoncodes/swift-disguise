@@ -1,4 +1,4 @@
-package me.onlyjordon.swiftdisguise.spigot.nms;
+package me.onlyjordon.swiftdisguise.nms;
 
 import org.bukkit.Bukkit;
 

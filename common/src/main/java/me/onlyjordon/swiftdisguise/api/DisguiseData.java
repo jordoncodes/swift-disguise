@@ -37,6 +37,7 @@ public class DisguiseData implements IDisguiseData {
         this.prefixSuffix = prefixSuffix;
     }
 
+
     @Override
     public UUID getFakeUUID() {
         return fakeUUID;
@@ -143,6 +144,24 @@ public class DisguiseData implements IDisguiseData {
         return getDisguisedAsEntity() != null ? getDisguisedAsEntity().equals(that.getDisguisedAsEntity()) : that.getDisguisedAsEntity() == null;
     }
 
+    @Override
+    public int hashCode() {
+        int result = getRealUUID() != null ? getRealUUID().hashCode() : 0;
+        result = 31 * result + (getFakeUUID() != null ? getFakeUUID().hashCode() : 0);
+        result = 31 * result + (getRealName() != null ? getRealName().hashCode() : 0);
+        result = 31 * result + (getFakeName() != null ? getFakeName().hashCode() : 0);
+        result = 31 * result + (getRealSkin() != null ? getRealSkin().hashCode() : 0);
+        result = 31 * result + (getFakeSkin() != null ? getFakeSkin().hashCode() : 0);
+        result = 31 * result + (getRealSkinLayers() != null ? getRealSkinLayers().hashCode() : 0);
+        result = 31 * result + (getFakeSkinLayers() != null ? getFakeSkinLayers().hashCode() : 0);
+        result = 31 * result + (getPrefixSuffix() != null ? getPrefixSuffix().hashCode() : 0);
+        result = 31 * result + (getDisguisedAsEntity() != null ? getDisguisedAsEntity().hashCode() : 0);
+        return result;
+    }
+
+    public DisguiseData copy() {
+        return new DisguiseData(realUUID, fakeUUID, realName, fakeName, realSkin, fakeSkin, realSkinLayers, fakeSkinLayers, prefixSuffix, disguisedAsEntity);
+    }
     public boolean skinAndNameAndUUIDEquals(Object o) {
         if (this == o) return true;
         if (!(o instanceof IDisguiseData)) return false;
@@ -168,21 +187,10 @@ public class DisguiseData implements IDisguiseData {
         return getFakeSkinLayers() != null ? getFakeSkinLayers().equals(that.getFakeSkinLayers()) : that.getFakeSkinLayers() == null;
     }
 
-    @Override
-    public int hashCode() {
-        int result = getRealUUID() != null ? getRealUUID().hashCode() : 0;
-        result = 31 * result + (getFakeUUID() != null ? getFakeUUID().hashCode() : 0);
-        result = 31 * result + (getRealName() != null ? getRealName().hashCode() : 0);
-        result = 31 * result + (getFakeName() != null ? getFakeName().hashCode() : 0);
-        result = 31 * result + (getRealSkin() != null ? getRealSkin().hashCode() : 0);
-        result = 31 * result + (getFakeSkin() != null ? getFakeSkin().hashCode() : 0);
-        result = 31 * result + (getRealSkinLayers() != null ? getRealSkinLayers().hashCode() : 0);
-        result = 31 * result + (getFakeSkinLayers() != null ? getFakeSkinLayers().hashCode() : 0);
-        result = 31 * result + (getDisguisedAsEntity() != null ? getDisguisedAsEntity().hashCode() : 0);
-        return result;
-    }
-
-    public DisguiseData copy() {
-        return new DisguiseData(realUUID, fakeUUID, realName, fakeName, realSkin, fakeSkin, realSkinLayers, fakeSkinLayers, prefixSuffix, disguisedAsEntity);
+    public boolean prefixSuffixEquals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DisguiseData)) return false;
+        DisguiseData that = (DisguiseData) o;
+        return getPrefixSuffix() != null ? getPrefixSuffix().equals(that.getPrefixSuffix()) : that.getPrefixSuffix() == null;
     }
 }

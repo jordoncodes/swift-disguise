@@ -1,30 +1,37 @@
-package me.onlyjordon.swiftdisguise.spigot.nms;
+package me.onlyjordon.swiftdisguise.nms;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.google.common.collect.Multimap;
+import me.onlyjordon.swiftdisguise.nms.NMSUtils;
 import me.onlyjordon.swiftdisguise.utils.Skin;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Server;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class CrossVersionPlayerHelper {
 
     private static final Class<?> craftPlayer;
+    private static final Class<?> craftEntity;
     private static final Class<?> playerClass;
+    private static final Class<?> entityClass;
     private static final Class<?> gameProfileClass;
     private static final Field getPing;
     private static final Field gameProfileField;
     private static final Method getPlayerHandle;
+    private static final Method getEntityHandle;
     private static final Method getServerHandle;
     private static final Constructor<?> gameProfileConstructor;
     private static final Field propertiesField;
@@ -48,6 +55,15 @@ public class CrossVersionPlayerHelper {
             }
             playerClass = playerClass1;
 
+            craftEntity = Class.forName("org.bukkit.craftbukkit." + NMSUtils.getMinecraftPackage() + ".entity.CraftEntity");
+            Class<?> entityClass1;
+            try {
+                entityClass1 = Class.forName("net.minecraft.world.entity.Entity");
+            } catch (Exception e) {
+                entityClass1 = Class.forName("net.minecraft.server." + NMSUtils.getMinecraftPackage() + ".Entity");
+            }
+            entityClass = entityClass1;
+
             Field getPing1;
             try {
                 System.out.println(playerClass);
@@ -59,23 +75,25 @@ public class CrossVersionPlayerHelper {
             if (getPing != null) getPing.setAccessible(true);
 
             getPlayerHandle = craftPlayer.getDeclaredMethod("getHandle");
+            getEntityHandle = craftEntity.getDeclaredMethod("getHandle");
+
             getPlayerHandle.setAccessible(true);
 
-            Field gameProfile1;
-            try {
-                gameProfile1 = playerClass.getDeclaredField("cq");
-            } catch (Exception e) {
-                gameProfile1 = playerClass.getDeclaredField("bH");
-            }
-            gameProfileField = gameProfile1;
+            gameProfileField = tryMultipleFields(playerClass, "cq", "cr", "bH");
+
+            if (gameProfileField == null) throw new NullPointerException("gameProfile field not found");
+            Class<?> gpClass = gameProfileField.getType();
+            if (gpClass == null) throw new NullPointerException("GameProfile class not found");
+            Constructor<?> gpConstructor = gpClass.getConstructor(UUID.class, String.class);
+
             gameProfileField.setAccessible(true);
 
             craftServerClass = Class.forName("org.bukkit.craftbukkit." + NMSUtils.getMinecraftPackage() + ".CraftServer");
             getServerHandle = craftServerClass.getDeclaredMethod("getHandle");
             getServerHandle.setAccessible(true);
 
-            gameProfileClass = gameProfileField.getType();
-            gameProfileConstructor = gameProfileClass.getConstructor(UUID.class, String.class);
+            gameProfileClass = gpClass;
+            gameProfileConstructor = gpConstructor;
 
             propertiesField = gameProfileClass.getDeclaredField("properties");
             propertiesField.setAccessible(true);
@@ -110,8 +128,12 @@ public class CrossVersionPlayerHelper {
             skinTextureSignatureMethod.setAccessible(true);
 
         } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException e) {
-            throw new RuntimeException(e);
+            throw  new RuntimeException(e);
         }
+    }
+
+    public static Class<?> getCraftPlayerClass() {
+        return craftPlayer;
     }
 
     public static int getPing(Player player) {
@@ -129,6 +151,14 @@ public class CrossVersionPlayerHelper {
     public static Object getHandle(Player player) {
         try {
             return getPlayerHandle.invoke(player);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Object getHandle(Entity entity) {
+        try {
+            return getEntityHandle.invoke(entity);
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -197,6 +227,31 @@ public class CrossVersionPlayerHelper {
         }
     }
 
+    public static void updateAllNamesOnServer() {
+        try {
+            Object server = getHandle(Bukkit.getServer());
+            Map map = (Map) playersByName.get(server);
+            map.clear();
+            Bukkit.getOnlinePlayers().forEach(p -> updateNameOnServer(p.getName(), p));
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void absMoveTo(Entity entity, double x, double y, double z, float yaw, float pitch) {
+        Object handle = getHandle(entity);
+        Method teleport = tryMultipleMethods(entityClass, new Class<?>[]{double.class, double.class, double.class, float.class, float.class}, "a", "teleport");
+        try {
+            teleport.invoke(handle, x, y, z, yaw, pitch);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void absMoveTo(Entity entity, Location loc) {
+        absMoveTo(entity, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+    }
+
     public static int getSkinLayersIndex(ServerVersion version) {
         // not sure how accurate this is, works on 1.20.4 & 1.8.8 though
         if (version.isOlderThan(ServerVersion.V_1_9)) {
@@ -212,5 +267,61 @@ public class CrossVersionPlayerHelper {
         } else {
             return 17; // 1.17+
         }
+    }
+
+    protected static Method tryMultipleMethods(Class<?> clazz, Class<?>[] args, Consumer<Method> check, String... possibleMethodNames) {
+        for (String methodName : possibleMethodNames) {
+            try {
+                Method method = clazz.getDeclaredMethod(methodName, args);
+                check.accept(method);
+                return method;
+            } catch (NoSuchMethodException e) {
+                // ignore
+            }
+        }
+        return null;
+    }
+
+    protected static Method tryMultipleMethods(Class<?> clazz, Class<?>[] args, String... possibleMethodNames) {
+        return tryMultipleMethods(clazz, args, (method) -> {}, possibleMethodNames);
+    }
+
+    protected static Field tryMultipleFields(Class<?> clazz, Consumer<Field> check, String... possibleFieldNames) {
+        for (String methodName : possibleFieldNames) {
+            try {
+                Field field = clazz.getDeclaredField(methodName);
+                check.accept(field);
+                return field;
+            } catch (NoSuchFieldException e) {
+                // ignore
+            }
+        }
+        return null;
+    }
+
+    protected static Field tryMultipleFields(Class<?> clazz, String... possibleFieldNames) {
+        return tryMultipleFields(clazz, (method) -> {}, possibleFieldNames);
+    }
+
+    protected static Class<?> tryMultipleClasses(String... possibleClassNames) {
+        for (String className : possibleClassNames) {
+            try {
+                return Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                // ignore
+            }
+        }
+        return null;
+    }
+
+    protected static Constructor<?> tryMultipleConstructors(Class<?>[] classes, Class<?>... args) {
+        for (Class<?> clazz : classes) {
+            try {
+                return clazz.getConstructor(args);
+            } catch (NoSuchMethodException e) {
+                // ignore
+            }
+        }
+        return null;
     }
 }

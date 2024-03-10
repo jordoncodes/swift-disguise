@@ -2,7 +2,7 @@ plugins {
     `java-library`
     java
     `maven-publish`
-    kotlin("jvm") version("1.9.22")
+    kotlin("jvm") version("1.9.23")
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
@@ -22,7 +22,7 @@ allprojects {
     java {
         withSourcesJar()
         withJavadocJar()
-        toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+        toolchain.languageVersion.set(JavaLanguageVersion.of(17))
     }
 
     repositories {
@@ -31,17 +31,15 @@ allprojects {
         maven(url = "https://repo.papermc.io/repository/maven-public/")
         maven(url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven(url = "https://repo.codemc.io/repository/maven-releases/")
+        maven(url = "https://repo.inventivetalent.org/repository/public/")
     }
+}
 
-    publishing {
-        publications {
-            create<MavenPublication>("mavenJava") {
-                groupId = project.group.toString()
-                artifactId = project.name
-                version = project.version.toString()
-                from(components["java"])
-            }
-        }
-    }
+
+tasks.create("jitpackBuild", DefaultTask::class) {
+    dependsOn(childProjects["common"]!!.tasks.build)
+    dependsOn(childProjects["api"]!!.tasks.build)
+    dependsOn(childProjects["platform"]!!.childProjects["spigot"]!!.tasks.build)
+    group = "build"
 }
 
