@@ -25,7 +25,7 @@ Include the dependency in a maven project:
 <dependencies>
     <!-- other dependencies -->
     <dependency>
-        <groupId>me.onlyjordon.swiftdisguise</groupId>
+        <groupId>com.github.jordoncodes.swift-disguise</groupId>
         <artifactId>spigot</artifactId>
         <version>v2.0.0</version>
         <scope>provided</scope>
@@ -37,6 +37,15 @@ Include the dependency in a maven project:
         </exclusions>
     </dependency>
 </dependencies>
+```
+
+Gradle (Kotlin DSL):
+```kotlin
+dependencies {
+    compileOnly("com.github.jordoncodes.swift-disguise:spigot:v2.0.0") {
+        exclude("org.mineskin", "java-client")
+    }
+}
 ```
 
 After that you can simply:
