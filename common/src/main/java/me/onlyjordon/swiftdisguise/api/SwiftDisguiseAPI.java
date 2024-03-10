@@ -54,6 +54,12 @@ public abstract class SwiftDisguiseAPI implements ISwiftDisguiseAPI {
         getDisguiseDataImpl(platformPlayer).setPrefixSuffix(prefixSuffix);
     }
 
+    @Override
+    public void resetDisguisePrefixSuffix(Object platformPlayer) {
+        checkPlayer(platformPlayer);
+        getDisguiseDataImpl(platformPlayer).setPrefixSuffix(new TabPrefixSuffix());
+    }
+
     protected Map<Object, IDisguiseData> getDisguiseDataMap() {
         return disguiseDataMap;
     }
@@ -81,19 +87,39 @@ public abstract class SwiftDisguiseAPI implements ISwiftDisguiseAPI {
     public void resetDisguise(Object platformPlayer) {
         checkPlayer(platformPlayer);
         resetDisguiseName(platformPlayer);
-        resetSkin(platformPlayer);
+        resetDisguiseSkin(platformPlayer);
+        resetDisguiseSkinLayers(platformPlayer);
+        resetDisguisePrefixSuffix(platformPlayer);
     }
 
     @Override
-    public SkinLayers getSkinLayers(Object platformPlayer) {
+    public void resetDisguiseSkinLayers(Object platformPlayer) {
+        checkPlayer(platformPlayer);
+        getDisguiseDataImpl(platformPlayer).setFakeSkinLayers(getDisguiseDataImpl(platformPlayer).getRealSkinLayers());
+    }
+
+    @Override
+    public SkinLayers getDisguiseSkinLayers(Object platformPlayer) {
         checkPlayer(platformPlayer);
         return getDisguiseDataImpl(platformPlayer).getFakeSkinLayers();
     }
 
     @Override
-    public void setSkinLayers(Object platformPlayer, SkinLayers skinLayers) {
+    public void setDisguiseSkinLayers(Object platformPlayer, SkinLayers skinLayers) {
         checkPlayer(platformPlayer);
         getDisguiseDataImpl(platformPlayer).setFakeSkinLayers(skinLayers);
+    }
+
+    @Override
+    public void setDisguiseSkinLayers(Object platformPlayer, EnumSet<SkinLayers.SkinLayer> layers) {
+        checkPlayer(platformPlayer);
+        getDisguiseDataImpl(platformPlayer).setFakeSkinLayers(SkinLayers.getFromVisibleLayers(layers));
+    }
+
+    @Override
+    public void setDisguiseSkinLayers(Object platformPlayer, SkinLayers.SkinLayer... layers) {
+        checkPlayer(platformPlayer);
+        getDisguiseDataImpl(platformPlayer).setFakeSkinLayers(SkinLayers.getFromVisibleLayers(layers));
     }
 
     @Override
@@ -134,7 +160,7 @@ public abstract class SwiftDisguiseAPI implements ISwiftDisguiseAPI {
     }
 
     @Override
-    public void resetSkin(Object platformPlayer) {
+    public void resetDisguiseSkin(Object platformPlayer) {
         checkPlayer(platformPlayer);
         setDisguiseSkin(platformPlayer, getRealSkin(platformPlayer));
     }

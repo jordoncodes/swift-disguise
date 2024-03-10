@@ -12,7 +12,7 @@ dependencies {
 //    compileOnly(fileTree("libs") { include("*.jar") })
     implementation(project(":common"))
     implementation(project(":api"))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
     compileOnlyApi("com.github.retrooper.packetevents:spigot:2.2.1")
     implementation("org.bspfsystems:yamlconfiguration:2.0.1")
     compileOnly("com.viaversion:viabackwards-common:4.9.2-SNAPSHOT") {

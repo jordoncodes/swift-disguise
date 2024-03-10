@@ -9,6 +9,11 @@ import com.viaversion.viaversion.api.connection.UserConnection
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper
 import com.viaversion.viaversion.api.type.Type
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15
+import me.onlyjordon.swiftdisguise.extensions.DisguiseExtensions.refreshPlayer
+import me.onlyjordon.swiftdisguise.extensions.DisguiseExtensions.setDisguiseName
+import me.onlyjordon.swiftdisguise.extensions.DisguiseExtensions.setDisguiseSkin
+import me.onlyjordon.swiftdisguise.extensions.DisguiseExtensions.setSkinLayerVisible
+import me.onlyjordon.swiftdisguise.utils.SkinLayers
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
@@ -30,6 +35,7 @@ object ViaBackwardsFixer {
         } else {
             return false
         }
+
     }
 
 

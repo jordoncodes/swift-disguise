@@ -7,6 +7,7 @@ import me.onlyjordon.swiftdisguise.api.ISwiftDisguiseAPI
 import me.onlyjordon.swiftdisguise.api.ITabPrefixSuffix
 import me.onlyjordon.swiftdisguise.api.SwiftDisguise
 import me.onlyjordon.swiftdisguise.api.SwiftDisguiseConfig
+import me.onlyjordon.swiftdisguise.extensions.PacketExtensions
 import me.onlyjordon.swiftdisguise.nms.CrossVersionPlayerHelper
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor

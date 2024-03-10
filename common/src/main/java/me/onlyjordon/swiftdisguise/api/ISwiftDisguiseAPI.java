@@ -11,6 +11,8 @@ import java.util.UUID;
 public interface ISwiftDisguiseAPI {
     void setDisguisePrefixSuffix(Object platformPlayer, TabPrefixSuffix prefixSuffix);
 
+    void resetDisguisePrefixSuffix(Object platformPlayer);
+
     void setDisguiseName(Object platformPlayer, String nick);
 
     void setDisguise(Object platformPlayer, String nick, Skin skin);
@@ -18,7 +20,7 @@ public interface ISwiftDisguiseAPI {
     void resetDisguise(Object platformPlayer);
 
     void resetDisguiseName(Object platformPlayer);
-    void resetSkin(Object platformPlayer);
+    void resetDisguiseSkin(Object platformPlayer);
 
     void refreshPlayer(Object platformPlayer);
 
@@ -36,9 +38,13 @@ public interface ISwiftDisguiseAPI {
     EnumSet<SkinLayers.SkinLayer> getVisibleSkinLayers(Object platformPlayer);
 
     SkinLayers getRealSkinLayers(Object platformPlayer);
-    SkinLayers getSkinLayers(Object platformPlayer);
-    void setSkinLayers(Object platformPlayer, SkinLayers skinLayers);
 
+    void resetDisguiseSkinLayers(Object platformPlayer);
+
+    SkinLayers getDisguiseSkinLayers(Object platformPlayer);
+    void setDisguiseSkinLayers(Object platformPlayer, SkinLayers skinLayers);
+    void setDisguiseSkinLayers(Object platformPlayer, EnumSet<SkinLayers.SkinLayer> layers);
+    void setDisguiseSkinLayers(Object platformPlayer, SkinLayers.SkinLayer... layers);
     void setSkinLayerVisible(Object platformPlayer, SkinLayers.SkinLayer skinLayer, boolean visible);
     boolean isSkinLayerVisible(Object platformPlayer, SkinLayers.SkinLayer skinLayer);
 

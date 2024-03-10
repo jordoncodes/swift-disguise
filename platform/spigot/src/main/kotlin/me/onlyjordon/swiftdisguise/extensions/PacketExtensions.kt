@@ -1,4 +1,4 @@
-package me.onlyjordon.swiftdisguise
+package me.onlyjordon.swiftdisguise.extensions
 
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.manager.server.ServerVersion

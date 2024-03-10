@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
     api("org.jetbrains:annotations:24.1.0")
     sourceSets.main {
         java.srcDirs("src/main/java", "src/main/kotlin")
