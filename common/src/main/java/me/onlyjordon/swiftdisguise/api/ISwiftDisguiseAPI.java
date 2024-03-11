@@ -69,5 +69,7 @@ public interface ISwiftDisguiseAPI {
 
     Object getPlayerByDisguiseName(String name);
 
+    Object getPlayerByRealName(String name);
+
     boolean isDisguiseNameTaken(String name);
 }
