@@ -24,17 +24,6 @@ dependencies {
     }
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            groupId = project.group.toString()
-            artifactId = project.name
-            version = project.version.toString()
-            from(components["java"])
-        }
-    }
-}
-
 sourceSets.main {
     java.srcDirs("src/main/java", "src/main/kotlin")
 }
