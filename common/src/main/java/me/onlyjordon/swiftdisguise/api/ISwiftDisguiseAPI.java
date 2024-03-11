@@ -66,4 +66,8 @@ public interface ISwiftDisguiseAPI {
     void refreshPlayerSync(Object platformPlayer);
 
     boolean isRealPlayer(Object platformPlayer);
+
+    Object getPlayerByDisguiseName(String name);
+
+    boolean isDisguiseNameTaken(String name);
 }

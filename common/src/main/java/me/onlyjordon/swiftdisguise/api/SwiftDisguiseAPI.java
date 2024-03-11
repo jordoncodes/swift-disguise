@@ -213,6 +213,26 @@ public abstract class SwiftDisguiseAPI implements ISwiftDisguiseAPI {
         return getDisguiseData(platformPlayer).getRealSkinLayers();
     }
 
+    @Override
+    public Object getPlayerByDisguiseName(String name) {
+        for (Map.Entry<Object, IDisguiseData> entry : disguiseDataMap.entrySet()) {
+            if (entry.getValue().getFakeName().equals(name)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isDisguiseNameTaken(String name) {
+        for (Map.Entry<Object, IDisguiseData> entry : disguiseDataMap.entrySet()) {
+            if (entry.getValue().getFakeName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected void checkPlayer(Object platformPlayer) {
         if (!validatePlatformPlayer(platformPlayer)) {
             throw new IllegalArgumentException("Invalid Player");
