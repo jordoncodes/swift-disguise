@@ -1,18 +1,15 @@
 package me.onlyjordon.swiftdisguise.packetevents;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
-import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
-import me.onlyjordon.swiftdisguise.SpigotPlatform;
 import me.onlyjordon.swiftdisguise.SwiftDisguiseSpigot;
 import me.onlyjordon.swiftdisguise.api.DisguiseData;
 import me.onlyjordon.swiftdisguise.events.PlayerSkinLayerChangeEvent;
@@ -37,7 +34,7 @@ public class SpigotPacketListener implements PacketListener {
             Player player = (Player) event.getPlayer();
             WrapperPlayClientSettings wrapper = new WrapperPlayClientSettings(event);
             ((DisguiseData)api.getDisguiseData(event.getPlayer())).setRealSkinLayers(SkinLayers.getFromRaw(wrapper.getVisibleSkinSectionMask()));
-            PlayerSkinLayerChangeEvent e = new PlayerSkinLayerChangeEvent(player, api.getSkinLayers(player), SkinLayers.getFromRaw(wrapper.getVisibleSkinSectionMask()));
+            PlayerSkinLayerChangeEvent e = new PlayerSkinLayerChangeEvent(player, api.getDisguiseSkinLayers(player), SkinLayers.getFromRaw(wrapper.getVisibleSkinSectionMask()));
             if (!e.isCancelled())
                 ((DisguiseData)api.getDisguiseData(event.getPlayer())).setFakeSkinLayers(e.getNewLayers());
         }
