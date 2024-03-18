@@ -1,5 +1,7 @@
 package me.onlyjordon.swiftdisguise.packetevents;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketEvent;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
@@ -8,14 +10,18 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.wrapper.configuration.client.WrapperConfigClientSettings;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import me.onlyjordon.swiftdisguise.SwiftDisguiseSpigot;
 import me.onlyjordon.swiftdisguise.api.DisguiseData;
 import me.onlyjordon.swiftdisguise.events.PlayerSkinLayerChangeEvent;
+import me.onlyjordon.swiftdisguise.nms.CrossVersionPlayerHelper;
 import me.onlyjordon.swiftdisguise.utils.SkinLayers;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -29,14 +35,25 @@ public class SpigotPacketListener implements PacketListener {
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
-        if (!(event.getPlayer() instanceof Player)) return;
-        if (event.getPacketType() == PacketType.Play.Client.CLIENT_SETTINGS) {
+        if (event.getPacketType() == PacketType.Configuration.Client.CLIENT_SETTINGS || event.getPacketType() == PacketType.Play.Client.CLIENT_SETTINGS) {
+            System.out.println("recv client settings");
+            if (!(event.getPlayer() instanceof Player)) {
+                WrapperConfigClientSettings settings = new WrapperConfigClientSettings(event);
+                Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(getClass()), () -> {
+                    WrapperPlayClientSettings wrapper = new WrapperPlayClientSettings(settings.getLocale(), settings.getViewDistance(), WrapperPlayClientSettings.ChatVisibility.valueOf(settings.getVisibility().toString()), settings.isChatColorable(), settings.getVisibleSkinSectionMask(), settings.getHand(), settings.isTextFilteringEnabled(), settings.isAllowServerListings());
+                    PacketEvents.getAPI().getPlayerManager().receivePacket(Bukkit.getPlayer(event.getUser().getUUID()), wrapper);
+                }, 2);
+                return;
+            }
+            System.out.println("successfully received player skinlayers");
             Player player = (Player) event.getPlayer();
             WrapperPlayClientSettings wrapper = new WrapperPlayClientSettings(event);
+            System.out.println("skin layersing");
             ((DisguiseData)api.getDisguiseData(event.getPlayer())).setRealSkinLayers(SkinLayers.getFromRaw(wrapper.getVisibleSkinSectionMask()));
             PlayerSkinLayerChangeEvent e = new PlayerSkinLayerChangeEvent(player, api.getDisguiseSkinLayers(player), SkinLayers.getFromRaw(wrapper.getVisibleSkinSectionMask()));
             if (!e.isCancelled())
                 ((DisguiseData)api.getDisguiseData(event.getPlayer())).setFakeSkinLayers(e.getNewLayers());
+            else System.out.println("event is cancelled");
         }
     }
 
@@ -46,7 +63,7 @@ public class SpigotPacketListener implements PacketListener {
         Player player = null;
         if (event.getPlayer() instanceof Player) player = (Player) event.getPlayer();
         if (player == null) return;
-//        if (!api.isRealPlayer(player)) return;
+        if (!api.isRealPlayer(player)) return;
         if (packetType.equals(PacketType.Play.Server.PLAYER_INFO)) {
             handlePlayerInfoPacket(player, new WrapperPlayServerPlayerInfo(event));
         } else if (packetType.equals(PacketType.Play.Server.PLAYER_INFO_UPDATE)) {
@@ -57,7 +74,23 @@ public class SpigotPacketListener implements PacketListener {
             handleSpawnPlayerPacket(player, new WrapperPlayServerSpawnPlayer(event));
         } else if (packetType.equals(PacketType.Play.Server.SPAWN_ENTITY)) {
             handleSpawnEntityPacket(player, new WrapperPlayServerSpawnEntity(event));
+        } else if (packetType.equals(PacketType.Play.Server.ENTITY_METADATA)) {
+            handleEntityMetadataPacket(player, new WrapperPlayServerEntityMetadata(event));
         }
+    }
+
+    private void handleEntityMetadataPacket(Player player, WrapperPlayServerEntityMetadata wrapper) {
+        Player metaPlayer = Bukkit.getOnlinePlayers().stream().filter(p -> p.getEntityId() == wrapper.getEntityId()).findFirst().orElse(null);
+        if (metaPlayer == null) return;
+        if (!api.isRealPlayer(metaPlayer)) return;
+        if (!api.isRealPlayer(player)) return;
+        SkinLayers layers = api.getDisguiseSkinLayers(metaPlayer);
+        if (layers == null) return;
+        wrapper.getEntityMetadata().forEach(meta -> {
+            if (meta.getIndex() == CrossVersionPlayerHelper.getSkinLayersIndex(PacketEvents.getAPI().getServerManager().getVersion())) {
+                meta.setValue(layers.getRawSkinLayers());
+            }
+        });
     }
 
     private void handleSpawnPlayerPacket(Player player, WrapperPlayServerSpawnPlayer wrapper) {

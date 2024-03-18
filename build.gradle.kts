@@ -22,7 +22,7 @@ allprojects {
     java {
         withSourcesJar()
         withJavadocJar()
-        toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+        toolchain.languageVersion.set(JavaLanguageVersion.of(if (System.getenv("JITPACK").toBoolean()) 11 else 17))
     }
 
     repositories {

@@ -10,10 +10,12 @@ import me.onlyjordon.swiftdisguise.packetevents.SpigotPacketListener;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 public class SwiftDisguiseSpigot extends SwiftDisguiseAPI {
@@ -21,15 +23,38 @@ public class SwiftDisguiseSpigot extends SwiftDisguiseAPI {
     public HashMap<Player, IDisguiseData> oldData = new HashMap<>();
     private PlayerRefresher refresher;
     protected Cache<UUID, UUID> tempUniqueIdMap = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS).build();
+    private ConcurrentLinkedQueue<Refresh> refreshQueue = new ConcurrentLinkedQueue<>();
+    private BukkitRunnable refreshRunnable;
 
     public SwiftDisguiseSpigot() {
         PacketEvents.getAPI().init();
         PacketEvents.getAPI().getEventManager().registerListener(new SpigotPacketListener(this), PacketListenerPriority.LOW);
         refresher = new PlayerRefresher(this, JavaPlugin.getProvidingPlugin(getClass()));
+        refreshRunnable = new BukkitRunnable() {
+            @Override
+            public void run() {
+                refreshQueue.forEach(refresh -> {
+                    if (!refresh.getPlayer().isOnline()) return;
+                    System.out.println("Refreshing " + refresh.getPlayer().getName());
+                    if (refresh.shouldRefreshNameSkin()) {
+                        refresher.refreshPlayer(refresh.getPlayer());
+                    }
+                    if (refresh.shouldRefreshSkinLayers()) {
+                        refresher.refreshSkinLayers(refresh.getPlayer());
+                    }
+                    if (refresh.shouldRefreshPrefixSuffix()) {
+                        refresher.refreshPrefixSuffix(refresh.getPlayer(), Bukkit.getOnlinePlayers().toArray(new Player[]{}));
+                    }
+                });
+                refreshQueue.clear();
+            }
+        };
+        refreshRunnable.runTaskTimer(JavaPlugin.getProvidingPlugin(getClass()), 1, 1);
     }
 
     public void disable() {
         PacketEvents.getAPI().terminate();
+        refreshRunnable.cancel();
     }
 
     public void sendPrefixSuffix(Player sender, Player... receiver) {
@@ -41,18 +66,24 @@ public class SwiftDisguiseSpigot extends SwiftDisguiseAPI {
         if (!validatePlatformPlayer(platformPlayer)) {
             throw new IllegalArgumentException("Invalid Player!");
         }
+
         Player player = (Player) platformPlayer;
         DisguiseData old = (DisguiseData) oldData.get(player);
-        if (old == null || !old.skinAndNameAndUUIDEquals(getDisguiseData(player))) {
-            refresher.refreshPlayer(player);
+        boolean shouldRefreshNameSkin = (old == null || !old.skinAndNameAndUUIDEquals(getDisguiseData(player)));
+        boolean shouldRefreshSkinLayers = (old == null || !old.skinLayersEquals(getDisguiseData(player)));
+        boolean shouldRefreshPrefixSuffix = (old == null || !old.prefixSuffixEquals(getDisguiseData(player)));
+        Refresh refresh = new Refresh(player, shouldRefreshNameSkin, shouldRefreshSkinLayers, shouldRefreshPrefixSuffix);
+        Refresh other = refreshQueue.stream().filter(r -> r.getPlayer().getUniqueId().equals(player.getUniqueId())).findFirst().orElse(null);
+        refreshQueue.remove(other);
+        if (other != null) {
+            refresh = combine(refresh, other);
         }
-        if (old == null || !old.skinLayersEquals(getDisguiseData(player))) {
-            refresher.refreshSkinLayers(player);
-        }
-        if (old == null || !old.prefixSuffixEquals(getDisguiseData(player))) {
-            refresher.refreshPrefixSuffix(player, Bukkit.getOnlinePlayers().toArray(new Player[]{}));
-        }
+        refreshQueue.add(refresh);
         oldData.put(player, ((DisguiseData)getDisguiseData(player)).copy());
+    }
+
+    private Refresh combine(Refresh refresh, Refresh other) {
+        return new Refresh(refresh.getPlayer(), refresh.shouldRefreshNameSkin() || other.shouldRefreshNameSkin(), refresh.shouldRefreshSkinLayers() || other.shouldRefreshSkinLayers(), refresh.shouldRefreshPrefixSuffix() || other.shouldRefreshPrefixSuffix());
     }
 
     @Override
@@ -107,5 +138,44 @@ public class SwiftDisguiseSpigot extends SwiftDisguiseAPI {
         tempUniqueIdMap.put(((Player) platformPlayer).getUniqueId(), UUID.randomUUID());
         getDisguiseDataMap().remove(platformPlayer);
         refresher.unregisterPlayer((Player) platformPlayer);
+    }
+
+    private static class Refresh {
+        private final boolean shouldRefreshNameSkin,
+                shouldRefreshSkinLayers,
+                shouldRefreshPrefixSuffix;
+
+        private final Player player;
+        public Refresh(Player player, boolean shouldRefreshNameSkin, boolean shouldRefreshSkinLayers, boolean shouldRefreshPrefixSuffix) {
+            this.player = player;
+            this.shouldRefreshPrefixSuffix = shouldRefreshPrefixSuffix;
+            this.shouldRefreshSkinLayers = shouldRefreshSkinLayers;
+            this.shouldRefreshNameSkin = shouldRefreshNameSkin;
+        }
+
+        public UUID getPlayerId() {
+            return player.getUniqueId();
+        }
+
+        public Player getPlayer() {
+            return player;
+        }
+
+        public boolean shouldRefreshNameSkin() {
+            return shouldRefreshNameSkin;
+        }
+
+        public boolean shouldRefreshPrefixSuffix() {
+            return shouldRefreshPrefixSuffix;
+        }
+
+        public boolean shouldRefreshSkinLayers() {
+            return shouldRefreshSkinLayers;
+        }
+
+        public boolean playerEquals(Refresh other) {
+            if (other == null) return false;
+            return getPlayerId().equals(other.getPlayerId());
+        }
     }
 }
