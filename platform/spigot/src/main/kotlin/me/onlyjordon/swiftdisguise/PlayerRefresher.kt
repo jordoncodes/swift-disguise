@@ -1,7 +1,15 @@
 package me.onlyjordon.swiftdisguise
 
+import com.github.retrooper.packetevents.PacketEvents
+import com.github.retrooper.packetevents.manager.server.ServerVersion
 import com.github.retrooper.packetevents.protocol.player.ClientVersion
+import com.github.retrooper.packetevents.protocol.player.GameMode
 import com.github.retrooper.packetevents.protocol.player.TextureProperty
+import com.github.retrooper.packetevents.protocol.player.UserProfile
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoRemove
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate.PlayerInfo
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams
 import me.onlyjordon.swiftdisguise.api.ISwiftDisguiseAPI
 import me.onlyjordon.swiftdisguise.api.ITabPrefixSuffix
@@ -11,6 +19,7 @@ import me.onlyjordon.swiftdisguise.extensions.PacketExtensions
 import me.onlyjordon.swiftdisguise.nms.CrossVersionPlayerHelper
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.Bukkit
 import org.bukkit.Bukkit.isPrimaryThread
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
@@ -167,5 +176,31 @@ class PlayerRefresher(private val api: ISwiftDisguiseAPI, private val plugin: Ja
         refreshPlayerTab(player, player.peUser.clientVersion, listOf(player))
         respawn(player)
         refreshForOthers(player)
+    }
+
+    fun removeUUID(fakeName: String, fakeUUID: UUID) {
+        println("removing fake uuid and name combo: $fakeName : $fakeUUID")
+//        val modernChange = WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LISTED, PlayerInfo(UserProfile(fakeUUID, fakeName), false, 0, GameMode.defaultGameMode(), null, null))
+        val modernRemove = WrapperPlayServerPlayerInfoRemove(fakeUUID, UUID.fromString("00000000-0000-0000-0000-000000000000"))
+        val serverVersion = PacketEvents.getAPI().serverManager.version
+        if (serverVersion.isNewerThan(ServerVersion.V_1_19_2)) {
+            Bukkit.getOnlinePlayers().forEach { it.sendPacket(modernRemove) }
+
+        }
+        val oldRemove = WrapperPlayServerPlayerInfo(
+            WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER,
+            WrapperPlayServerPlayerInfo.PlayerData(null,
+                UserProfile(fakeUUID, fakeName),
+                GameMode.defaultGameMode(),
+                0
+            ),
+            WrapperPlayServerPlayerInfo.PlayerData(null,
+                UserProfile(UUID.fromString("00000000-0000-0000-0000-000000000000"), ""),
+                GameMode.defaultGameMode(),
+                0
+            )
+        )
+        Bukkit.getOnlinePlayers().forEach { it.sendPacket(oldRemove) }
+
     }
 }

@@ -21,6 +21,18 @@ public abstract class SwiftDisguiseAPI implements ISwiftDisguiseAPI {
     }
 
     @Override
+    public void setDisguiseUniqueId(Object platformPlayer, UUID uuid) {
+        checkPlayer(platformPlayer);
+        getDisguiseDataImpl(platformPlayer).setFakeUUID(uuid);
+    }
+
+    @Override
+    public UUID getDisguiseUniqueId(Object platformPlayer) {
+        checkPlayer(platformPlayer);
+        return getDisguiseData(platformPlayer).getFakeUUID();
+    }
+
+    @Override
     public void setDisguiseData(Object platformPlayer, IDisguiseData disguiseData) {
         checkPlayer(platformPlayer);
         disguiseDataMap.put(platformPlayer, disguiseData);

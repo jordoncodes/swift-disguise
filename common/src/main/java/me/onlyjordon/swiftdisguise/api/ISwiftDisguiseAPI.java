@@ -72,4 +72,7 @@ public interface ISwiftDisguiseAPI {
     Object getPlayerByRealName(String name);
 
     boolean isDisguiseNameTaken(String name);
+
+    void setDisguiseUniqueId(Object platformPlayer, UUID uuid);
+    UUID getDisguiseUniqueId(Object platformPlayer);
 }

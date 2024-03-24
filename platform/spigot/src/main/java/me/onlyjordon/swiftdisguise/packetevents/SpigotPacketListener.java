@@ -24,6 +24,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class SpigotPacketListener implements PacketListener {
 
@@ -86,7 +88,7 @@ public class SpigotPacketListener implements PacketListener {
         if (!api.isRealPlayer(player)) return;
         SkinLayers layers = api.getDisguiseSkinLayers(metaPlayer);
         if (layers == null) return;
-        wrapper.getEntityMetadata().forEach(meta -> {
+         wrapper.getEntityMetadata().forEach(meta -> {
             if (meta.getIndex() == CrossVersionPlayerHelper.getSkinLayersIndex(PacketEvents.getAPI().getServerManager().getVersion())) {
                 meta.setValue(layers.getRawSkinLayers());
             }
@@ -120,8 +122,18 @@ public class SpigotPacketListener implements PacketListener {
 
 
     private void handlePlayerInfoRemovePacket(Player receiver, WrapperPlayServerPlayerInfoRemove wrapper) {
+
+        AtomicBoolean hasRemoved = new AtomicBoolean(false);
+        wrapper.setProfileIds(wrapper.getProfileIds().stream().filter(id -> {
+            boolean rem = (id != null && !id.equals(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+            if (rem) hasRemoved.set(true);
+            return hasRemoved.get();
+        }).collect(Collectors.toList()));
+        if (hasRemoved.get()) return;
+
         List<UUID> fakeIds = new ArrayList<>();
         wrapper.getProfileIds().forEach(uuid -> {
+
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) return;
             if (!api.isRealPlayer(player)) return;
@@ -151,6 +163,13 @@ public class SpigotPacketListener implements PacketListener {
     }
 
     private void handlePlayerInfoPacket(Player receiver, WrapperPlayServerPlayerInfo wrapper) {
+        AtomicBoolean hasRemoved = new AtomicBoolean(false);
+        wrapper.setPlayerDataList(wrapper.getPlayerDataList().stream().filter(playerData -> {
+            boolean rem = (playerData.getUser() != null && !playerData.getUser().getUUID().equals(UUID.fromString("00000000-0000-0000-0000-000000000000")));
+            if (rem) hasRemoved.set(true);
+            return hasRemoved.get();
+        }).collect(Collectors.toList()));
+        if (hasRemoved.get()) return;
         wrapper.getPlayerDataList().forEach(playerData -> {
             Player player = Bukkit.getPlayer(playerData.getUserProfile().getUUID());
             if (!api.isRealPlayer(player)) return;

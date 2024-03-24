@@ -72,6 +72,11 @@ public class SwiftDisguiseSpigot extends SwiftDisguiseAPI {
         boolean shouldRefreshNameSkin = (old == null || !old.skinAndNameAndUUIDEquals(getDisguiseData(player)));
         boolean shouldRefreshSkinLayers = (old == null || !old.skinLayersEquals(getDisguiseData(player)));
         boolean shouldRefreshPrefixSuffix = (old == null || !old.prefixSuffixEquals(getDisguiseData(player)));
+
+        if (shouldRefreshNameSkin) {
+            if (old != null) refresher.removeUUID(old.getFakeName(), old.getFakeUUID());
+            else refresher.removeUUID(getDisguiseData(player).getRealName(), getDisguiseData(player).getRealUUID());
+        }
         Refresh refresh = new Refresh(player, shouldRefreshNameSkin, shouldRefreshSkinLayers, shouldRefreshPrefixSuffix);
         Refresh other = refreshQueue.stream().filter(r -> r.getPlayer().getUniqueId().equals(player.getUniqueId())).findFirst().orElse(null);
         refreshQueue.remove(other);

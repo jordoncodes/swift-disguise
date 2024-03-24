@@ -1,5 +1,6 @@
 package me.onlyjordon.swiftdisguise.commands.impl;
 
+import com.github.retrooper.packetevents.util.UUIDUtil;
 import me.onlyjordon.swiftdisguise.SpigotPlatform;
 import me.onlyjordon.swiftdisguise.api.ISwiftDisguiseAPI;
 import me.onlyjordon.swiftdisguise.api.ITabPrefixSuffix;
@@ -7,6 +8,7 @@ import me.onlyjordon.swiftdisguise.api.SwiftDisguise;
 import me.onlyjordon.swiftdisguise.api.TabPrefixSuffix;
 import me.onlyjordon.swiftdisguise.commands.PlayerOnlyCommand;
 import me.onlyjordon.swiftdisguise.utils.Skin;
+import me.onlyjordon.swiftdisguise.utils.UUIDFetcher;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
@@ -28,7 +30,13 @@ public class CommandDisguise extends PlayerOnlyCommand {
                 ITabPrefixSuffix.NametagColor.WHITE,
                 0
         ));
-        for (int i = 0; i < 10; i++) {
+        try {
+            api.setDisguiseUniqueId(player, UUIDFetcher.fetchUUID(args[0]).get());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < 30; i++) {
             api.refreshPlayer(player);
         }
         player.sendMessage("You are now disguised as " + args[0] + "!");
