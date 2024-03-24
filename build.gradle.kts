@@ -7,13 +7,13 @@ plugins {
 }
 
 allprojects {
-    project.ext.set("adventureVersion", "4.15.0")
+    project.ext.set("adventureVersion", "4.16.0")
     project.ext.set("adventureBukkitVersion", "4.3.2")
     apply(plugin = "java")
     apply(plugin = "java-library")
     apply(plugin = "maven-publish")
     group = "me.onlyjordon.swiftdisguise"
-    version = "v2.0.0"
+    version = "v2.2.0"
     description = ""
 
     java.sourceCompatibility = JavaVersion.VERSION_1_8
