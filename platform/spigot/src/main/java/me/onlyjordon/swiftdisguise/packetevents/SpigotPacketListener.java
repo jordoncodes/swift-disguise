@@ -38,7 +38,6 @@ public class SpigotPacketListener implements PacketListener {
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
         if (event.getPacketType() == PacketType.Configuration.Client.CLIENT_SETTINGS || event.getPacketType() == PacketType.Play.Client.CLIENT_SETTINGS) {
-            System.out.println("recv client settings");
             if (!(event.getPlayer() instanceof Player)) {
                 WrapperConfigClientSettings settings = new WrapperConfigClientSettings(event);
                 Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(getClass()), () -> {
@@ -47,15 +46,12 @@ public class SpigotPacketListener implements PacketListener {
                 }, 2);
                 return;
             }
-            System.out.println("successfully received player skinlayers");
             Player player = (Player) event.getPlayer();
             WrapperPlayClientSettings wrapper = new WrapperPlayClientSettings(event);
-            System.out.println("skin layersing");
             ((DisguiseData)api.getDisguiseData(event.getPlayer())).setRealSkinLayers(SkinLayers.getFromRaw(wrapper.getVisibleSkinSectionMask()));
             PlayerSkinLayerChangeEvent e = new PlayerSkinLayerChangeEvent(player, api.getDisguiseSkinLayers(player), SkinLayers.getFromRaw(wrapper.getVisibleSkinSectionMask()));
             if (!e.isCancelled())
                 ((DisguiseData)api.getDisguiseData(event.getPlayer())).setFakeSkinLayers(e.getNewLayers());
-            else System.out.println("event is cancelled");
         }
     }
 

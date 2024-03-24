@@ -35,7 +35,6 @@ public class SwiftDisguiseSpigot extends SwiftDisguiseAPI {
             public void run() {
                 refreshQueue.forEach(refresh -> {
                     if (!refresh.getPlayer().isOnline()) return;
-                    System.out.println("Refreshing " + refresh.getPlayer().getName());
                     if (refresh.shouldRefreshNameSkin()) {
                         refresher.refreshPlayer(refresh.getPlayer());
                     }

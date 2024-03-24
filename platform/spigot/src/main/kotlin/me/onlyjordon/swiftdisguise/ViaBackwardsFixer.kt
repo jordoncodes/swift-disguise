@@ -30,7 +30,6 @@ object ViaBackwardsFixer {
         val isServerOld = PacketEvents.getAPI().serverManager.version.isOlderThan(ServerVersion.V_1_16)
         if (shouldUseVia && isClientOld && !isServerOld) {
             sendRespawnPacketWithViaImpl(player, seed, gamemode, isFlat)
-            println("sending packet with Via* to ${player.name} who is on version ${PacketEvents.getAPI().playerManager.getClientVersion(player)}")
             return true
         } else {
             return false

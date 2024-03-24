@@ -199,7 +199,6 @@ class PlayerRefresher(private val api: ISwiftDisguiseAPI, private val plugin: Ja
     }
 
     fun removeUUID(fakeName: String, fakeUUID: UUID) {
-        println("removing fake uuid and name combo: $fakeName : $fakeUUID")
 //        val modernChange = WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_LISTED, PlayerInfo(UserProfile(fakeUUID, fakeName), false, 0, GameMode.defaultGameMode(), null, null))
         val modernRemove = WrapperPlayServerPlayerInfoRemove(fakeUUID, UUID.fromString("00000000-0000-0000-0000-000000000000"))
         val serverVersion = PacketEvents.getAPI().serverManager.version

@@ -66,7 +66,6 @@ public class CrossVersionPlayerHelper {
 
             Field getPing1;
             try {
-//                System.out.println(playerClass);
                 getPing1 = Class.forName("net.minecraft.server." + NMSUtils.getMinecraftPackage() + ".EntityPlayer").getDeclaredField("ping");
             } catch (Exception e) {
                 getPing1 = null;
