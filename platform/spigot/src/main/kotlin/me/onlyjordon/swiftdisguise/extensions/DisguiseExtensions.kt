@@ -10,7 +10,7 @@ import me.onlyjordon.swiftdisguise.utils.SkinLayers.SkinLayer
 import org.bukkit.entity.Player
 import java.io.File
 import java.net.URL
-import java.util.EnumSet
+import java.util.*
 
 object DisguiseExtensions {
 

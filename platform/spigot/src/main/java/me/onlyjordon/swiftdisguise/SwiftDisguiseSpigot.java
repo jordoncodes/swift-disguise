@@ -21,10 +21,10 @@ import java.util.concurrent.TimeUnit;
 public class SwiftDisguiseSpigot extends SwiftDisguiseAPI {
 
     public HashMap<Player, IDisguiseData> oldData = new HashMap<>();
-    private PlayerRefresher refresher;
+    private final PlayerRefresher refresher;
     protected Cache<UUID, UUID> tempUniqueIdMap = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS).build();
-    private ConcurrentLinkedQueue<Refresh> refreshQueue = new ConcurrentLinkedQueue<>();
-    private BukkitRunnable refreshRunnable;
+    private final ConcurrentLinkedQueue<Refresh> refreshQueue = new ConcurrentLinkedQueue<>();
+    private final BukkitRunnable refreshRunnable;
 
     public SwiftDisguiseSpigot() {
         PacketEvents.getAPI().init();

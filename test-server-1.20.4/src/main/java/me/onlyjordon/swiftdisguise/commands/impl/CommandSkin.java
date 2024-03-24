@@ -7,14 +7,13 @@ import me.onlyjordon.swiftdisguise.utils.Util;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
 public class CommandSkin extends PlayerOnlyCommand {
 
-    private SwiftDisguiseAPI api;
+    private final SwiftDisguiseAPI api;
 
     public CommandSkin(SwiftDisguiseAPI api) {
         super("skin", "skin.use");

@@ -14,7 +14,7 @@ public interface ITabPrefixSuffix {
     void setPriority(int priority);
     void setColor(NametagColor color);
 
-    public enum NametagColor {
+    enum NametagColor {
         BLACK,
         DARK_BLUE,
         DARK_GREEN,

@@ -22,7 +22,7 @@ import org.bukkit.World
 import org.bukkit.World.Environment
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
-import java.util.EnumSet
+import java.util.*
 
 open class PacketExtensions {
     protected fun Player.sendPacket(packet: PacketWrapper<*>?) {
@@ -174,7 +174,7 @@ open class PacketExtensions {
 
     protected fun Player.teleportToOtherDimensionAndBack() {
         val loc = location
-        val otherDimLoc = loc.clone();
+        val otherDimLoc = loc.clone()
         otherDimLoc.world = getAnyOtherWorld(world)
         teleport(otherDimLoc)
         teleport(loc)

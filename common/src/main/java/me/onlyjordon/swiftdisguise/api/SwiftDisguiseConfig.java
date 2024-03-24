@@ -40,7 +40,7 @@ public class SwiftDisguiseConfig {
      */
     public enum UUIDHidingMode {
         NONE,
-        RANDOM;
+        RANDOM
     }
 
     /**

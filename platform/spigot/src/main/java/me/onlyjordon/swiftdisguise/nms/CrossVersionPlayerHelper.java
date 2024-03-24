@@ -4,7 +4,6 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.google.common.collect.Multimap;
-import me.onlyjordon.swiftdisguise.nms.NMSUtils;
 import me.onlyjordon.swiftdisguise.utils.Skin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

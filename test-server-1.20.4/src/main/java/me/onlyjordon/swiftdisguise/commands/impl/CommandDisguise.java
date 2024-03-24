@@ -1,6 +1,5 @@
 package me.onlyjordon.swiftdisguise.commands.impl;
 
-import com.github.retrooper.packetevents.util.UUIDUtil;
 import me.onlyjordon.swiftdisguise.SpigotPlatform;
 import me.onlyjordon.swiftdisguise.api.ISwiftDisguiseAPI;
 import me.onlyjordon.swiftdisguise.api.ITabPrefixSuffix;

@@ -2,7 +2,6 @@ package me.onlyjordon.swiftdisguise.api;
 
 import me.onlyjordon.swiftdisguise.utils.Skin;
 import me.onlyjordon.swiftdisguise.utils.SkinLayers;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
