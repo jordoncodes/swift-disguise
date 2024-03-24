@@ -227,8 +227,9 @@ public abstract class SwiftDisguiseAPI implements ISwiftDisguiseAPI {
 
     @Override
     public Object getPlayerByDisguiseName(String name) {
+        if (name == null) return null;
         for (Map.Entry<Object, IDisguiseData> entry : disguiseDataMap.entrySet()) {
-            if (entry.getValue().getFakeName().equals(name)) {
+            if (entry.getValue().getFakeName().equalsIgnoreCase(name)) {
                 return entry.getKey();
             }
         }
@@ -237,8 +238,9 @@ public abstract class SwiftDisguiseAPI implements ISwiftDisguiseAPI {
 
     @Override
     public Object getPlayerByRealName(String name) {
+        if (name == null) return null;
         for (Map.Entry<Object, IDisguiseData> entry : disguiseDataMap.entrySet()) {
-            if (entry.getValue().getRealName().equals(name)) {
+            if (entry.getValue().getRealName().equalsIgnoreCase(name)) {
                 return entry.getKey();
             }
         }

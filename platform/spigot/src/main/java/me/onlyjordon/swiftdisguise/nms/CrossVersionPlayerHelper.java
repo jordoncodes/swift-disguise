@@ -8,6 +8,7 @@ import me.onlyjordon.swiftdisguise.utils.Skin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -24,6 +25,7 @@ public class CrossVersionPlayerHelper {
 
     private static final Class<?> craftPlayer;
     private static final Class<?> craftEntity;
+    private static final Class<?> craftWorld;
     private static final Class<?> playerClass;
     private static final Class<?> entityClass;
     private static final Class<?> gameProfileClass;
@@ -32,6 +34,7 @@ public class CrossVersionPlayerHelper {
     private static final Method getPlayerHandle;
     private static final Method getEntityHandle;
     private static final Method getServerHandle;
+    private static final Method getWorldHandle;
     private static final Constructor<?> gameProfileConstructor;
     private static final Field propertiesField;
     private static final Class<?> propertyClass;
@@ -41,7 +44,7 @@ public class CrossVersionPlayerHelper {
     private static final Field playersByName;
     private static final Method skinTextureValueMethod;
     private static final Method skinTextureSignatureMethod;
-
+    private static final Class<?> serverPlayerClass;
 
     static {
         try {
@@ -63,6 +66,8 @@ public class CrossVersionPlayerHelper {
             }
             entityClass = entityClass1;
 
+            craftWorld = Class.forName("org.bukkit.craftbukkit." + NMSUtils.getMinecraftPackage() + ".CraftWorld");
+
             Field getPing1;
             try {
                 getPing1 = Class.forName("net.minecraft.server." + NMSUtils.getMinecraftPackage() + ".EntityPlayer").getDeclaredField("ping");
@@ -74,8 +79,10 @@ public class CrossVersionPlayerHelper {
 
             getPlayerHandle = craftPlayer.getDeclaredMethod("getHandle");
             getEntityHandle = craftEntity.getDeclaredMethod("getHandle");
+            getWorldHandle = craftWorld.getDeclaredMethod("getHandle");
 
             getPlayerHandle.setAccessible(true);
+            serverPlayerClass = getPlayerHandle.getReturnType();
 
             gameProfileField = tryMultipleFields(playerClass, "cq", "cr", "bH");
 
@@ -146,6 +153,10 @@ public class CrossVersionPlayerHelper {
         }
     }
 
+    public static Class<?> getServerPlayerClass() {
+        return serverPlayerClass;
+    }
+
     public static Object getHandle(Player player) {
         try {
             return getPlayerHandle.invoke(player);
@@ -168,6 +179,22 @@ public class CrossVersionPlayerHelper {
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static Object getHandle(World world) {
+        try {
+            return getWorldHandle.invoke(world);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Class<?> getCraftWorld() {
+        return craftWorld;
+    }
+
+    public static Method getWorldHandleMethod() {
+        return getWorldHandle;
     }
 
     public static Skin skinFromBukkitPlayer(Player player) {
@@ -322,4 +349,6 @@ public class CrossVersionPlayerHelper {
         }
         return null;
     }
+
+
 }

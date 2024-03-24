@@ -14,6 +14,8 @@ import me.onlyjordon.swiftdisguise.api.SwiftDisguise
 import me.onlyjordon.swiftdisguise.api.SwiftDisguiseConfig
 import me.onlyjordon.swiftdisguise.extensions.PacketExtensions
 import me.onlyjordon.swiftdisguise.nms.CrossVersionPlayerHelper
+import me.onlyjordon.swiftdisguise.nms.RespawnNMS
+import me.onlyjordon.swiftdisguise.utils.Util.isPaper
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
@@ -122,32 +124,52 @@ class PlayerRefresher(private val api: ISwiftDisguiseAPI, private val plugin: Ja
             }
             return
         }
-        if (!ViaBackwardsFixer.sendRespawnPacketWithVia(player, 0L, player.peGameMode.id.toShort(), false)) player.sendPacket(player.respawnPacket)
-        val l = player.location.clone()
-        player.sendPacket(player.teleportPacket)
-        player.teleport(player)
-        player.teleport(l)
-        player.exp = player.exp
-        player.health = player.health
-        player.healthScale = player.healthScale
-        player.foodLevel = player.foodLevel
-        player.saturation = player.saturation
-        player.allowFlight = player.allowFlight
-        if (player.compassTarget != null)
-            player.compassTarget = player.compassTarget
-        player.exhaustion = player.exhaustion
-        player.level = player.level
+        try {
+            // Any other works, just the shortest I could find.
+            val refresh = CrossVersionPlayerHelper.getCraftPlayerClass().getDeclaredMethod("refreshPlayer")
+            refresh.isAccessible = true
+            println("refeshing player with paper")
+            refresh.invoke(player)
+            return
+        } catch (ignored: ClassNotFoundException) {
+        } catch (ignored: NoSuchMethodException) {
+        } catch (ignored: IllegalAccessException) {
+        } catch (ignored: java.lang.reflect.InvocationTargetException) {
+            try {
+                RespawnNMS.nmsRespawn(player) // try respawning with nms
+            } catch (ex: Exception) {
+                // try respawning using packetevents:
+                if (!ViaBackwardsFixer.sendRespawnPacketWithVia(player, 0L, player.peGameMode.id.toShort(), false)) player.sendPacket(player.respawnPacket)
+                val l = player.location.clone()
+                player.sendPacket(player.teleportPacket)
+                player.teleport(player)
+                player.teleport(l)
+                player.exp = player.exp
+                player.health = player.health
+                player.healthScale = player.healthScale
+                player.foodLevel = player.foodLevel
+                player.saturation = player.saturation
+                player.allowFlight = player.allowFlight
+                if (player.compassTarget != null)
+                    player.compassTarget = player.compassTarget
+                player.exhaustion = player.exhaustion
+                player.level = player.level
 
-        val loc = player.world.spawnLocation
-        val wb = player.world.worldBorder
-        player.sendPacket(WrapperPlayServerWorldBorder(wb.center.x, wb.center.z, 0.0, wb.size, 1, 1, wb.warningTime, wb.warningDistance))
-        player.sendPacket(WrapperPlayServerTimeUpdate(player.world.fullTime, player.world.time))
-        player.sendPacket(WrapperPlayServerSpawnPosition(Vector3i(loc.blockX, loc.blockY, loc.blockZ), 0f))
-        player.sendPacket(refreshChunksPacket)
-        player.updateInventory()
-        player.sendPacket(WrapperPlayServerHeldItemChange(player.inventory.heldItemSlot))
-        val respawn = if (player.world.getGameRuleValue("immediateRespawn").toBoolean()) 1.0F else 0.0F
-        player.sendPacket(WrapperPlayServerChangeGameState(WrapperPlayServerChangeGameState.Reason.ENABLE_RESPAWN_SCREEN, respawn))
+                val loc = player.world.spawnLocation
+                val wb = player.world.worldBorder
+                player.sendPacket(WrapperPlayServerWorldBorder(wb.center.x, wb.center.z, 0.0, wb.size, 1, 1, wb.warningTime, wb.warningDistance))
+                player.sendPacket(WrapperPlayServerTimeUpdate(player.world.fullTime, player.world.time))
+                player.sendPacket(WrapperPlayServerSpawnPosition(Vector3i(loc.blockX, loc.blockY, loc.blockZ), 0f))
+                player.sendPacket(refreshChunksPacket)
+                player.sendPacket(WrapperPlayServerUpdateViewDistance(Bukkit.getServer().viewDistance))
+//        player.sendPacket(WrapperPlayServerPlayerAbilities(player.allowFlight, player.isFlying, player.isFlying, player.isFlying, player.flySpeed, player.walkSpeed))
+                player.updateInventory()
+                player.sendPacket(WrapperPlayServerHeldItemChange(player.inventory.heldItemSlot))
+                val respawn = if (player.world.getGameRuleValue("immediateRespawn").toBoolean()) 1.0F else 0.0F
+                player.sendPacket(WrapperPlayServerChangeGameState(WrapperPlayServerChangeGameState.Reason.ENABLE_RESPAWN_SCREEN, respawn))
+            }
+        }
+
 
 
     }

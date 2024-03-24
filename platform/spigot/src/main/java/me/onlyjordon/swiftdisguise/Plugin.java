@@ -25,22 +25,23 @@ public class Plugin extends JavaPlugin implements Listener {
         super.onDisable();
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent e) {
         SwiftDisguiseSpigot disguise = (SwiftDisguiseSpigot) SwiftDisguise.getAPI(SpigotPlatform.get());
         disguise.refreshPlayerSync(e.getPlayer());
         Bukkit.getOnlinePlayers().forEach(p -> disguise.sendPrefixSuffix(p, e.getPlayer()));
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onQuit(PlayerQuitEvent e) {
         SwiftDisguiseSpigot disguise = (SwiftDisguiseSpigot) SwiftDisguise.getAPI(SpigotPlatform.get());
         disguise.unregisterPlayer(e.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onRespawn(PlayerRespawnEvent e) {
         SwiftDisguiseSpigot disguise = (SwiftDisguiseSpigot) SwiftDisguise.getAPI(SpigotPlatform.get());
+        disguise.refreshPlayerSync(e.getPlayer());
         Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(getClass()), () -> disguise.refreshPlayerSync(e.getPlayer()), 1);
     }
 }
