@@ -6,11 +6,17 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion
 import com.github.retrooper.packetevents.protocol.player.GameMode
 import com.github.retrooper.packetevents.protocol.player.TextureProperty
 import com.github.retrooper.packetevents.protocol.player.UserProfile
+import com.github.retrooper.packetevents.util.Vector3i
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChangeGameState
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerHeldItemChange
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoRemove
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate.PlayerInfo
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnPosition
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTimeUpdate
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWorldBorder
 import me.onlyjordon.swiftdisguise.api.ISwiftDisguiseAPI
 import me.onlyjordon.swiftdisguise.api.ITabPrefixSuffix
 import me.onlyjordon.swiftdisguise.api.SwiftDisguise
@@ -31,7 +37,6 @@ class PlayerRefresher(private val api: ISwiftDisguiseAPI, private val plugin: Ja
     private val oldTabPrefixSuffix = HashMap<UUID, ITabPrefixSuffix>()
 
     fun refreshSelf(player: Player) {
-        if (isPrimaryThread()) { runAsyncThread { refreshSelf(player) }; return }
         updateGameProfile(player)
         refreshPlayerTab(player, player.peUser.clientVersion, listOf(player))
         respawn(player)
@@ -50,7 +55,6 @@ class PlayerRefresher(private val api: ISwiftDisguiseAPI, private val plugin: Ja
     }
 
     fun refreshForOthers(player: Player) {
-        if (isPrimaryThread()) { runAsyncThread { refreshForOthers(player) }; return }
         val players = ArrayList(player.world.players)
         players.removeIf { it.uniqueId.equals(player.uniqueId) }
 
@@ -121,24 +125,40 @@ class PlayerRefresher(private val api: ISwiftDisguiseAPI, private val plugin: Ja
 
 
     private fun respawn(player: Player) {
-        if (!ViaBackwardsFixer.sendRespawnPacketWithVia(player, 0L, player.peGameMode.id.toShort(), false)) player.sendPacket(player.respawnPacket)
-        player.sendPacket(player.teleportPacket)
-        runPrimaryThread {
-            if (player.isOnline) {
-                player.teleport(player)
-                player.sendPacket(refreshChunksPacket)
-                player.updateInventory()
-                player.exp = player.exp
-                player.health = player.health
-                player.healthScale = player.healthScale
-                player.foodLevel = player.foodLevel
-                player.saturation = player.saturation
-                player.allowFlight = player.allowFlight
-                player.compassTarget = player.compassTarget
-                player.exhaustion = player.exhaustion
-                player.level = player.level
+        if (!isPrimaryThread()) {
+            runPrimaryThread {
+                respawn(player)
             }
+            return
         }
+        if (!ViaBackwardsFixer.sendRespawnPacketWithVia(player, 0L, player.peGameMode.id.toShort(), false)) player.sendPacket(player.respawnPacket)
+        val l = player.location.clone()
+        player.sendPacket(player.teleportPacket)
+        player.teleport(player)
+        player.teleport(l)
+        player.exp = player.exp
+        player.health = player.health
+        player.healthScale = player.healthScale
+        player.foodLevel = player.foodLevel
+        player.saturation = player.saturation
+        player.allowFlight = player.allowFlight
+        if (player.compassTarget != null)
+            player.compassTarget = player.compassTarget
+        player.exhaustion = player.exhaustion
+        player.level = player.level
+
+        val loc = player.world.spawnLocation
+        val wb = player.world.worldBorder
+        player.sendPacket(WrapperPlayServerWorldBorder(wb.center.x, wb.center.z, 0.0, wb.size, 1, 1, wb.warningTime, wb.warningDistance))
+        player.sendPacket(WrapperPlayServerTimeUpdate(player.world.fullTime, player.world.time))
+        player.sendPacket(WrapperPlayServerSpawnPosition(Vector3i(loc.blockX, loc.blockY, loc.blockZ), 0f))
+        player.sendPacket(refreshChunksPacket)
+        player.updateInventory()
+        player.sendPacket(WrapperPlayServerHeldItemChange(player.inventory.heldItemSlot))
+        val respawn = if (player.world.getGameRuleValue("immediateRespawn").toBoolean()) 1.0F else 0.0F
+        player.sendPacket(WrapperPlayServerChangeGameState(WrapperPlayServerChangeGameState.Reason.ENABLE_RESPAWN_SCREEN, respawn))
+
+
     }
 
     fun refreshPlayer(player: Player) {

@@ -11,6 +11,7 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile
 import com.github.retrooper.packetevents.protocol.world.Difficulty
 import com.github.retrooper.packetevents.protocol.world.Dimension
 import com.github.retrooper.packetevents.protocol.world.Location
+import com.github.retrooper.packetevents.util.Vector3d
 import com.github.retrooper.packetevents.wrapper.PacketWrapper
 import com.github.retrooper.packetevents.wrapper.play.server.*
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChangeGameState.Reason
@@ -165,7 +166,7 @@ open class PacketExtensions {
         get() = location.toPacketEvents()
 
     protected val Player.teleportPacket: PacketWrapper<*>
-        get() = WrapperPlayServerEntityTeleport(entityId, peLocation, isOnGround)
+        get() = WrapperPlayServerEntityTeleport(entityId, Location(Vector3d(0.0, -100.0, 0.0), location.yaw, location.pitch), isOnGround)
 
     private fun getAnyOtherWorld(world: World): World {
         return Bukkit.getWorlds().firstOrNull { it.uid != world.uid } ?: world

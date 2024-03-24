@@ -5,9 +5,12 @@ import me.onlyjordon.swiftdisguise.api.SwiftDisguise;
 import me.onlyjordon.swiftdisguise.api.SwiftDisguiseLoader;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Plugin extends JavaPlugin implements Listener {
@@ -25,15 +28,21 @@ public class Plugin extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        ISwiftDisguiseAPI disguise = SwiftDisguise.getAPI(SpigotPlatform.get());
-        disguise.refreshPlayerSync(event.getPlayer());
-        Bukkit.getOnlinePlayers().forEach(p -> ((SwiftDisguiseSpigot) disguise).sendPrefixSuffix(p, event.getPlayer()));
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        SwiftDisguiseSpigot disguise = (SwiftDisguiseSpigot) SwiftDisguise.getAPI(SpigotPlatform.get());
+        disguise.refreshPlayerSync(e.getPlayer());
+        Bukkit.getOnlinePlayers().forEach(p -> disguise.sendPrefixSuffix(p, e.getPlayer()));
     }
 
     @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
+    public void onQuit(PlayerQuitEvent e) {
         SwiftDisguiseSpigot disguise = (SwiftDisguiseSpigot) SwiftDisguise.getAPI(SpigotPlatform.get());
-        disguise.unregisterPlayer(event.getPlayer());
+        disguise.unregisterPlayer(e.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onRespawn(PlayerRespawnEvent e) {
+        SwiftDisguiseSpigot disguise = (SwiftDisguiseSpigot) SwiftDisguise.getAPI(SpigotPlatform.get());
+        Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(getClass()), () -> disguise.refreshPlayerSync(e.getPlayer()), 1);
     }
 }
