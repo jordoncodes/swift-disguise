@@ -2,6 +2,7 @@ package me.onlyjordon.swiftdisguise.extensions
 
 import me.onlyjordon.swiftdisguise.SpigotPlatform
 import me.onlyjordon.swiftdisguise.SwiftDisguiseSpigot
+import me.onlyjordon.swiftdisguise.api.ITabPrefixSuffix.NametagColor
 import me.onlyjordon.swiftdisguise.api.SwiftDisguise
 import me.onlyjordon.swiftdisguise.api.TabPrefixSuffix
 import me.onlyjordon.swiftdisguise.utils.Skin
@@ -15,6 +16,25 @@ import java.util.*
 object DisguiseExtensions {
 
     private val api: SwiftDisguiseSpigot = SwiftDisguise.getAPI(SpigotPlatform.get()) as SwiftDisguiseSpigot
+    var Player.disguiseSkinLayers: EnumSet<SkinLayer>
+        get() = api.getVisibleSkinLayers(this)
+        set(value) = api.setDisguiseSkinLayers(this, value)
+
+    var Player.disguiseSkin: Skin
+        get() = api.getDisguiseSkin(this)
+        set(value) = api.setDisguiseSkin(this, value)
+
+    var Player.disguiseName: String
+        get() = api.getDisguiseName(this)
+        set(value) = api.setDisguiseName(this, value)
+
+    var Player.disguisePrefixSuffix: TabPrefixSuffix
+        get() = api.getDisguisePrefixSuffix(this)
+        set(value) = api.setDisguisePrefixSuffix(this, value)
+
+    var Player.disguiseUniqueId: UUID
+        get() = api.getDisguiseUniqueId(this)
+        set(value) = api.setDisguiseUniqueId(this, value)
 
     fun Player.refreshPlayer() {
         api.refreshPlayer(this)
@@ -24,16 +44,8 @@ object DisguiseExtensions {
         api.refreshPlayerSync(this)
     }
 
-    fun Player.setDisguiseName(name: String) {
-        api.setDisguiseName(this, name)
-    }
-
     fun Player.setDisguiseSkin(username: String) {
         api.setDisguiseSkin(this, username)
-    }
-
-    fun Player.setDisguiseSkin(skin: Skin) {
-        api.setDisguiseSkin(this, skin)
     }
 
     fun Player.setDisguiseSkin(url: URL) {
@@ -44,36 +56,8 @@ object DisguiseExtensions {
         api.setDisguiseSkin(this, file)
     }
 
-    fun Player.setDisguisePrefixSuffix(prefixSuffix: TabPrefixSuffix) {
-        api.setDisguisePrefixSuffix(this, prefixSuffix)
-    }
-
-    fun Player.setDisguiseSkinLayers(layers: EnumSet<SkinLayer>) {
-        api.setDisguiseSkinLayers(this, layers)
-    }
-
-    fun Player.setDisguiseSkinLayers(layers: SkinLayers) {
-        api.setDisguiseSkinLayers(this, layers)
-    }
-
-    fun Player.getDisguiseName(): String {
-        return api.getDisguiseName(this)
-    }
-
-    fun Player.getDisguiseSkin(): Skin {
-        return api.getDisguiseSkin(this)
-    }
-
-    fun Player.getDisguisePrefixSuffix(): TabPrefixSuffix {
-        return api.getDisguisePrefixSuffix(this)
-    }
-
     fun Player.getDisguiseVisibleSkinLayers(): EnumSet<SkinLayer> {
         return api.getVisibleSkinLayers(this)
-    }
-
-    fun Player.getDisguiseSkinLayers(): SkinLayers {
-        return api.getDisguiseSkinLayers(this)
     }
 
     fun Player.resetDisguiseName() {
@@ -86,10 +70,6 @@ object DisguiseExtensions {
 
     fun Player.resetDisguisePrefixSuffix() {
         api.resetDisguisePrefixSuffix(this)
-    }
-
-    fun Player.resetDisguiseSkinLayers() {
-        api.resetDisguiseSkinLayers(this)
     }
 
     fun Player.resetDisguise() {
