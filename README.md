@@ -27,7 +27,7 @@ Include the dependency in a maven project:
     <dependency>
         <groupId>com.github.jordoncodes.swift-disguise</groupId>
         <artifactId>spigot</artifactId>
-        <version>v2.0.0</version>
+        <version>v2.2.0</version>
         <scope>provided</scope>
         <exclusions>
             <exclusion>
@@ -54,6 +54,7 @@ After that you can simply:
 SwiftDisguiseAPI api = SwiftDisguise.getAPI(SpigotPlatform.get());
 api.setDisguiseSkin(player, "Notch"); // set skin to notch's skin
 api.setDisguiseName(player, "Notch"); // set name to notch
+api.setDisguiseUniqueId(player, UUIDFetcher.fetchUUID("Notch").get())
 api.setSkinLayerVisible(player, SkinLayers.SkinLayer.CAPE, false); // hide cape
 
 // V makes the name of the player in the tablist and above their head "Prefix {player's nickname} Suffix". This uses [Adventure](https://docs.advntr.dev/index.html).
@@ -66,10 +67,17 @@ api.setDisguisePrefixSuffix(player, new TabPrefixSuffix(
 api.refreshPlayer(player); // finally, apply the changes!
 ```
 
-Alternatively, you can use Kotlin extension functions (player is a Bukkit Player):
+Alternatively, you can use Kotlin extension functions (player is a Bukkit `Player`):
 ```kotlin
-player.setDisguiseName("Notch") // set player's name to notch
-player.setDisguiseSkin("Notch") // set player's skin to notch's skin
+player.disguiseName = "Notch" // set player's name to notch
+player.disguiseSkin = "Notch" // set player's skin to notch's skin
+player.disguisePrefixSuffix = TabPrefixSuffix(
+        Component.text("Prefix "),
+        Component.text(" Suffix"),
+        NametagColor.WHITE,
+        0 // priority in the tablist, higher priority = lower position in tablist.
+)
+player.disguiseUniqueId = UUIDFetcher.fetch("Notch").get()
 player.setSkinLayerVisible(SkinLayers.SkinLayer.CAPE, false) // hide cape
 player.refreshPlayer() // finally, apply the changes!
 ```
