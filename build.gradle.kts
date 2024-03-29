@@ -13,7 +13,7 @@ allprojects {
     apply(plugin = "java-library")
     apply(plugin = "maven-publish")
     group = "me.onlyjordon.swiftdisguise"
-    version = "v2.2.0"
+    version = "v2.3.0"
     description = ""
 
     java.sourceCompatibility = JavaVersion.VERSION_1_8

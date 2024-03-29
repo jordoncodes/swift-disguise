@@ -7,7 +7,7 @@ Used in:
 The main features of this API are: changing a player's name, changing a player's skin, giving the player a prefix/suffix using a scoreboard team packet. If you want a new version, feel free to make an issue!
 
 ## Note
-Sometimes the respawning will cause PlayerRespawnEvent, this shouldn't happen on papermc servers and is dependant on client & server version.
+Sometimes the respawning will call a PlayerRespawnEvent, this shouldn't happen on modern papermc servers and is dependent on client & server version.
 
 # This is early in development and WILL change!
 # You can download in the releases section, on [SpigotMC](https://www.spigotmc.org/resources/swiftdisguise.115002/) or on [PaperMC Hangar](https://hangar.papermc.io/onlyjordon/SwiftDisguise).
@@ -30,7 +30,7 @@ Include the dependency in a maven project:
     <dependency>
         <groupId>com.github.jordoncodes.swift-disguise</groupId>
         <artifactId>spigot</artifactId>
-        <version>v2.2.0</version>
+        <version>v2.3.0</version>
         <scope>provided</scope>
         <exclusions>
             <exclusion>
@@ -73,7 +73,7 @@ api.refreshPlayer(player); // finally, apply the changes!
 Alternatively, you can use Kotlin extension functions (player is a Bukkit `Player`):
 ```kotlin
 player.disguiseName = "Notch" // set player's name to notch
-player.disguiseSkin = "Notch" // set player's skin to notch's skin
+player.disguiseSkin = Skin.getSkin("Notch") // set player's skin to notch's skin, makes mojang api calls
 player.disguisePrefixSuffix = TabPrefixSuffix(
         Component.text("Prefix "),
         Component.text(" Suffix"),
