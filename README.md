@@ -6,6 +6,9 @@ Used in:
 ## Features:
 The main features of this API are: changing a player's name, changing a player's skin, giving the player a prefix/suffix using a scoreboard team packet. If you want a new version, feel free to make an issue!
 
+## Note
+Sometimes the respawning will cause PlayerRespawnEvent, this shouldn't happen on papermc servers and is dependant on client & server version.
+
 # This is early in development and WILL change!
 # You can download in the releases section, on [SpigotMC](https://www.spigotmc.org/resources/swiftdisguise.115002/) or on [PaperMC Hangar](https://hangar.papermc.io/onlyjordon/SwiftDisguise).
 
