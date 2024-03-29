@@ -34,8 +34,8 @@ Include the dependency in a maven project:
         <scope>provided</scope>
         <exclusions>
             <exclusion>
-                <groupId>org.mineskin</groupId>
-                <artifactId>java-client</artifactId>
+                <groupId>*</groupId>
+                <artifactId>*</artifactId>
             </exclusion>
         </exclusions>
     </dependency>
@@ -46,7 +46,7 @@ Gradle (Kotlin DSL):
 ```kotlin
 dependencies {
     compileOnly("com.github.jordoncodes.swift-disguise:spigot:v2.0.0") {
-        exclude("org.mineskin", "java-client")
+        isTransitive = false
     }
 }
 ```
