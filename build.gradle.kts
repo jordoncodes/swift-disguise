@@ -33,6 +33,10 @@ allprojects {
         maven(url = "https://repo.codemc.io/repository/maven-releases/")
         maven(url = "https://repo.inventivetalent.org/repository/public/")
     }
+
+    dependencies {
+        implementation("com.google.guava:guava:33.1.0-jre")
+    }
 }
 
 
@@ -43,3 +47,4 @@ tasks.create("jitpackBuild", DefaultTask::class) {
     group = "build"
 }
 
+tasks.build.get().finalizedBy(tasks.shadowJar.get())

@@ -35,3 +35,13 @@ tasks {
     }
 
 }
+
+tasks.register("copyJars", Copy::class) {
+    from(tasks.shadowJar.get().destinationDirectory.get())
+    into(file("${project.rootDir}/test-server-1.20.4/1.8.8-run/plugins/"))
+    exclude("${project.name}-${project.version}-javadoc.jar")
+    exclude("${project.name}-${project.version}-${tasks.jar.get().archiveClassifier.get()}.jar")
+    exclude("${project.name}-${project.version}-sources.jar")
+}
+
+tasks.shadowJar.get().finalizedBy(tasks.getByName("copyJars"))

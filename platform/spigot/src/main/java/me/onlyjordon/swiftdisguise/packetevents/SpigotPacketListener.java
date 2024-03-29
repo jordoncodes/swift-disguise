@@ -22,7 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class SpigotPacketListener implements PacketListener {
@@ -41,7 +40,7 @@ public class SpigotPacketListener implements PacketListener {
                 Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(getClass()), () -> {
                     WrapperPlayClientSettings wrapper = new WrapperPlayClientSettings(settings.getLocale(), settings.getViewDistance(), WrapperPlayClientSettings.ChatVisibility.valueOf(settings.getVisibility().toString()), settings.isChatColorable(), settings.getVisibleSkinSectionMask(), settings.getHand(), settings.isTextFilteringEnabled(), settings.isAllowServerListings());
                     PacketEvents.getAPI().getPlayerManager().receivePacket(Bukkit.getPlayer(event.getUser().getUUID()), wrapper);
-                }, 2);
+                }, 5);
                 return;
             }
             Player player = (Player) event.getPlayer();
@@ -82,7 +81,7 @@ public class SpigotPacketListener implements PacketListener {
         if (!api.isRealPlayer(player)) return;
         SkinLayers layers = api.getDisguiseSkinLayers(metaPlayer);
         if (layers == null) return;
-         wrapper.getEntityMetadata().forEach(meta -> {
+        wrapper.getEntityMetadata().forEach(meta -> {
             if (meta.getIndex() == CrossVersionPlayerHelper.getSkinLayersIndex(PacketEvents.getAPI().getServerManager().getVersion())) {
                 meta.setValue(layers.getRawSkinLayers());
             }
@@ -116,14 +115,12 @@ public class SpigotPacketListener implements PacketListener {
 
 
     private void handlePlayerInfoRemovePacket(Player receiver, WrapperPlayServerPlayerInfoRemove wrapper) {
-
-        AtomicBoolean hasRemoved = new AtomicBoolean(false);
-        wrapper.setProfileIds(wrapper.getProfileIds().stream().filter(id -> {
-            boolean rem = (id != null && !id.equals(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-            if (rem) hasRemoved.set(true);
-            return hasRemoved.get();
-        }).collect(Collectors.toList()));
-        if (hasRemoved.get()) return;
+        if (wrapper.getProfileIds().contains(UUID.fromString("00000000-0000-0000-0000-000000000000"))) {
+            wrapper.setProfileIds(wrapper.getProfileIds().stream().filter(id ->
+                    !UUID.fromString("00000000-0000-0000-0000-000000000000").equals(id)
+            ).collect(Collectors.toList()));
+            return;
+        }
 
         List<UUID> fakeIds = new ArrayList<>();
         wrapper.getProfileIds().forEach(uuid -> {
@@ -157,13 +154,12 @@ public class SpigotPacketListener implements PacketListener {
     }
 
     private void handlePlayerInfoPacket(Player receiver, WrapperPlayServerPlayerInfo wrapper) {
-        AtomicBoolean hasRemoved = new AtomicBoolean(false);
-        wrapper.setPlayerDataList(wrapper.getPlayerDataList().stream().filter(playerData -> {
-            boolean rem = (playerData.getUser() != null && !playerData.getUser().getUUID().equals(UUID.fromString("00000000-0000-0000-0000-000000000000")));
-            if (rem) hasRemoved.set(true);
-            return hasRemoved.get();
-        }).collect(Collectors.toList()));
-        if (hasRemoved.get()) return;
+        if (wrapper.getAction() == WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER) {
+            if (wrapper.getPlayerDataList().stream().map(a -> a.getUser() == null ? null : a.getUser().getUUID()).collect(Collectors.toList()).contains(UUID.fromString("00000000-0000-0000-0000-000000000000"))) {
+                wrapper.setPlayerDataList(wrapper.getPlayerDataList().stream().filter(playerData -> !(playerData.getUser() != null && UUID.fromString("00000000-0000-0000-0000-000000000000").equals(playerData.getUser().getUUID()))).collect(Collectors.toList()));
+                return;
+            }
+        }
         wrapper.getPlayerDataList().forEach(playerData -> {
             Player player = Bukkit.getPlayer(playerData.getUserProfile().getUUID());
             if (!api.isRealPlayer(player)) return;
@@ -176,7 +172,6 @@ public class SpigotPacketListener implements PacketListener {
                 profile.setUUID(player.getUniqueId());
             }
             profile.setName(api.getDisguiseName(player));
-
             TextureProperty textureProperty = new TextureProperty("textures", api.getDisguiseSkin(player).getValue(), api.getDisguiseSkin(player).getSignature());
             profile.setTextureProperties(new ArrayList<TextureProperty>() { { add(textureProperty); } });
             playerData.setUser(profile);

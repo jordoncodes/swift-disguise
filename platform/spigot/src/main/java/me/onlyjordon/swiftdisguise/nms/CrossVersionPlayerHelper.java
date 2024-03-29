@@ -204,7 +204,6 @@ public class CrossVersionPlayerHelper {
 
             Collection<?> textures = properties.get("textures");
             if (textures == null || textures.isEmpty()) {
-                System.out.println("empty textures, returning null");
                 return null;
             }
             Object texture = textures.iterator().next();

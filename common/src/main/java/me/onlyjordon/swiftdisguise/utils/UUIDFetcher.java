@@ -11,13 +11,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class UUIDFetcher {
 
-    private static final Cache<String, UUID> cache = CacheBuilder.newBuilder().expireAfterAccess(Duration.ofMinutes(5L)).build();
+    private static final Cache<String, UUID> cache = CacheBuilder.newBuilder().weakKeys().weakValues().build();
 
     public static CompletableFuture<UUID> fetchUUID(String playerName) {
         UUID id = cache.getIfPresent(playerName.toLowerCase());
@@ -32,7 +31,6 @@ public class UUIDFetcher {
                 connection.connect();
 
                 if(connection.getResponseCode() == 400) {
-                    System.err.println("There is no player with the name \"" + playerName + "\"!");
                     return UUID.randomUUID();
                 }
 
@@ -67,15 +65,15 @@ public class UUIDFetcher {
                 "0x" + uuidAsString.substring(20, 32)
         };
 
-        long mostSigBits = Long.decode(parts[0]).longValue();
+        long mostSigBits = Long.decode(parts[0]);
         mostSigBits <<= 16;
-        mostSigBits |= Long.decode(parts[1]).longValue();
+        mostSigBits |= Long.decode(parts[1]);
         mostSigBits <<= 16;
-        mostSigBits |= Long.decode(parts[2]).longValue();
+        mostSigBits |= Long.decode(parts[2]);
 
-        long leastSigBits = Long.decode(parts[3]).longValue();
+        long leastSigBits = Long.decode(parts[3]);
         leastSigBits <<= 48;
-        leastSigBits |= Long.decode(parts[4]).longValue();
+        leastSigBits |= Long.decode(parts[4]);
 
         return new UUID(mostSigBits, leastSigBits);
     }

@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class SwiftDisguiseSpigot extends SwiftDisguiseAPI {
 
     public HashMap<Player, IDisguiseData> oldData = new HashMap<>();
-    private final PlayerRefresher refresher;
+    final PlayerRefresher refresher;
     protected Cache<UUID, UUID> tempUniqueIdMap = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS).build();
     private final ConcurrentLinkedQueue<Refresh> refreshQueue = new ConcurrentLinkedQueue<>();
     private final BukkitRunnable refreshRunnable;
@@ -73,9 +73,9 @@ public class SwiftDisguiseSpigot extends SwiftDisguiseAPI {
         boolean shouldRefreshPrefixSuffix = (old == null || !old.prefixSuffixEquals(getDisguiseData(player)));
 
         if (shouldRefreshNameSkin) {
-            if (old != null) refresher.removeUUID(old.getFakeName(), old.getFakeUUID());
-            else refresher.removeUUID(getDisguiseData(player).getRealName(), getDisguiseData(player).getRealUUID());
+            refresher.removeUUID(old, player);
         }
+
         Refresh refresh = new Refresh(player, shouldRefreshNameSkin, shouldRefreshSkinLayers, shouldRefreshPrefixSuffix);
         Refresh other = refreshQueue.stream().filter(r -> r.getPlayer().getUniqueId().equals(player.getUniqueId())).findFirst().orElse(null);
         refreshQueue.remove(other);

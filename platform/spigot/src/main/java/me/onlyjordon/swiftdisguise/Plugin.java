@@ -1,5 +1,6 @@
 package me.onlyjordon.swiftdisguise;
 
+import me.onlyjordon.swiftdisguise.api.DisguiseData;
 import me.onlyjordon.swiftdisguise.api.SwiftDisguise;
 import me.onlyjordon.swiftdisguise.api.SwiftDisguiseLoader;
 import org.bukkit.Bukkit;
@@ -29,6 +30,7 @@ public class Plugin extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         SwiftDisguiseSpigot disguise = (SwiftDisguiseSpigot) SwiftDisguise.getAPI(SpigotPlatform.get());
         disguise.refreshPlayerSync(e.getPlayer());
+        disguise.oldData.put(e.getPlayer(), ((DisguiseData)disguise.getDisguiseData(e.getPlayer())).copy());
         Bukkit.getOnlinePlayers().forEach(p -> disguise.sendPrefixSuffix(p, e.getPlayer()));
     }
 
@@ -41,7 +43,9 @@ public class Plugin extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onRespawn(PlayerRespawnEvent e) {
         SwiftDisguiseSpigot disguise = (SwiftDisguiseSpigot) SwiftDisguise.getAPI(SpigotPlatform.get());
-        disguise.refreshPlayerSync(e.getPlayer());
-        Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(getClass()), () -> disguise.refreshPlayerSync(e.getPlayer()), 1);
+        if (disguise.refresher.getRespawnMethod() == PlayerRefresher.RespawnMethod.PACKET_EVENTS && e.getPlayer().isDead()) {
+            disguise.refreshPlayerSync(e.getPlayer());
+            Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(getClass()), () -> disguise.refreshPlayerSync(e.getPlayer()), 1);
+        }
     }
 }
