@@ -272,7 +272,6 @@ class PlayerRefresher(private val api: ISwiftDisguiseAPI, private val plugin: Ja
         if (serverVersion.isNewerThan(ServerVersion.V_1_19_2)) {
             Bukkit.getOnlinePlayers().forEach { it.sendPacket(modernRemove) }
         }
-        player.sendMessage("Refreshing with uuid ${disguiseData.fakeUUID} and name ${disguiseData.fakeName}, isNull $isNull and uuid to remove is ${disguiseData.fakeUUID}")
         val oldRemove = WrapperPlayServerPlayerInfo(
             WrapperPlayServerPlayerInfo.Action.REMOVE_PLAYER,
             WrapperPlayServerPlayerInfo.PlayerData(null,

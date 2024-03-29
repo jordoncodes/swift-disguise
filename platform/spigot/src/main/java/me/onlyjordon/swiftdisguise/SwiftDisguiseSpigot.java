@@ -139,6 +139,7 @@ public class SwiftDisguiseSpigot extends SwiftDisguiseAPI {
     @ApiStatus.Internal
     public void unregisterPlayer(Object platformPlayer) {
         checkPlayer(platformPlayer);
+        refresher.removeUUID((DisguiseData) oldData.get((Player) platformPlayer), (Player) platformPlayer);
         tempUniqueIdMap.put(((Player) platformPlayer).getUniqueId(), UUID.randomUUID());
         getDisguiseDataMap().remove(platformPlayer);
         refresher.unregisterPlayer((Player) platformPlayer);

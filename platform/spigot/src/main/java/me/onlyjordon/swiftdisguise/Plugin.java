@@ -29,6 +29,7 @@ public class Plugin extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent e) {
         SwiftDisguiseSpigot disguise = (SwiftDisguiseSpigot) SwiftDisguise.getAPI(SpigotPlatform.get());
+        disguise.refresher.removeUUID((DisguiseData) disguise.getDisguiseData(e.getPlayer()), e.getPlayer());
         disguise.refreshPlayerSync(e.getPlayer());
         disguise.oldData.put(e.getPlayer(), ((DisguiseData)disguise.getDisguiseData(e.getPlayer())).copy());
         Bukkit.getOnlinePlayers().forEach(p -> disguise.sendPrefixSuffix(p, e.getPlayer()));
