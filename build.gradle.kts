@@ -13,7 +13,7 @@ allprojects {
     apply(plugin = "java-library")
     apply(plugin = "maven-publish")
     group = "me.onlyjordon.swiftdisguise"
-    version = "v2.3.1"
+    version = "v2.3.2"
     description = ""
 
     java.sourceCompatibility = JavaVersion.VERSION_1_8
@@ -46,5 +46,7 @@ tasks.create("jitpackBuild", DefaultTask::class) {
     dependsOn(childProjects["platform"]!!.childProjects["spigot"]!!.tasks.build)
     group = "build"
 }
+
+
 
 tasks.build.get().finalizedBy(tasks.shadowJar.get())

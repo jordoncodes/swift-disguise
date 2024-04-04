@@ -1,3 +1,5 @@
+import java.util.stream.Collectors
+
 plugins {
     id("xyz.jpenilla.run-paper") version "2.2.3"
     id("com.github.johnrengelman.shadow") version "8.1.1"
@@ -36,12 +38,18 @@ tasks {
 
 }
 
-tasks.register("copyJars", Copy::class) {
-    from(tasks.shadowJar.get().destinationDirectory.get())
-    into(file("${project.rootDir}/test-server-1.20.4/1.8.8-run/plugins/"))
-    exclude("${project.name}-${project.version}-javadoc.jar")
-    exclude("${project.name}-${project.version}-${tasks.jar.get().archiveClassifier.get()}.jar")
-    exclude("${project.name}-${project.version}-sources.jar")
+tasks.shadowJar.get().dependsOn(":platform:spigot:shadowJar")
+
+fun copyTask(name: String, intoFile: File) {
+    tasks.register(name, Copy::class) {
+        from(tasks.shadowJar.get().destinationDirectory.get())
+        into(intoFile)
+        exclude("${project.name}-${project.version}-javadoc.jar")
+        exclude("${project.name}-${project.version}-${tasks.jar.get().archiveClassifier.get()}.jar")
+        exclude("${project.name}-${project.version}-sources.jar")
+    }
+    tasks.shadowJar.get().finalizedBy(tasks.getByName(name))
 }
 
-tasks.shadowJar.get().finalizedBy(tasks.getByName("copyJars"))
+//copyTask("copyJarsLegacy", file("${project.rootDir}/legacy-test-server/plugins/"))
+//copyTask("copyJarsSpigot", file("${project.rootDir}/spigot-test-server/plugins/"))

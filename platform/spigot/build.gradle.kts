@@ -14,9 +14,14 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":api"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
-    compileOnlyApi("com.github.retrooper.packetevents:spigot:2.2.1")
+//    implementation("net.kyori:adventure-api:${project.ext.get("adventureVersion")}")
+//    implementation("net.kyori:adventure-text-serializer-gson:${project.ext.get("adventureVersion")}")
+//    implementation("net.kyori:adventure-text-serializer-legacy:${project.ext.get("adventureVersion")}")
     implementation("org.bspfsystems:yamlconfiguration:2.0.1")
     implementation("com.google.guava:guava:33.1.0-jre")
+
+    implementation("com.github.retrooper.packetevents:spigot:2.2.1")
+
 
     compileOnly("com.viaversion:viabackwards-common:4.9.2-SNAPSHOT") {
         isTransitive = false
@@ -42,6 +47,10 @@ tasks {
     shadowJar {
         archiveClassifier = null
         relocate("org.yaml", "me.onlyjordon.swiftdisguise.libs.yaml")
+        relocate("com.github.retrooper", "me.onlyjordon.swiftdisguise.libs.retrooper")
+        relocate("io.github.retrooper", "me.onlyjordon.swiftdisguise.libs.retrooper")
+        relocate("net.kyori", "me.onlyjordon.swiftdisguise.libs.kyori")
+        relocate("com.google.gson", "me.onlyjordon.swiftdisguise.libs.gson")
     }
 }
 
@@ -58,23 +67,20 @@ publishing {
 
 tasks.build.get().finalizedBy(tasks.shadowJar.get())
 
-tasks.register("copyJarsModern", Copy::class) {
-    from(tasks.shadowJar.get().destinationDirectory.get())
-    into(file("${project.rootDir}/test-server-1.20.4/run/plugins/"))
-    exclude("${project.name}-${project.version}-javadoc.jar")
-    exclude("${project.name}-${project.version}-${tasks.jar.get().archiveClassifier.get()}.jar")
-    exclude("${project.name}-${project.version}-sources.jar")
-}
-tasks.register("copyJarsLegacy", Copy::class) {
-    from(tasks.shadowJar.get().destinationDirectory.get())
-    into(file("${project.rootDir}/test-server-1.20.4/1.8.8-run/plugins/"))
-    exclude("${project.name}-${project.version}-javadoc.jar")
-    exclude("${project.name}-${project.version}-${tasks.jar.get().archiveClassifier.get()}.jar")
-    exclude("${project.name}-${project.version}-sources.jar")
+fun copyTask(name: String, intoFile: File) {
+    tasks.register(name, Copy::class) {
+        from(tasks.shadowJar.get().destinationDirectory.get())
+        into(intoFile)
+        exclude("${project.name}-${project.version}-javadoc.jar")
+        exclude("${project.name}-${project.version}-${tasks.jar.get().archiveClassifier.get()}.jar")
+        exclude("${project.name}-${project.version}-sources.jar")
+    }
+    tasks.shadowJar.get().finalizedBy(tasks.getByName(name))
 }
 
-tasks.shadowJar.get().finalizedBy(tasks.getByName("copyJarsModern"))
-tasks.getByName("copyJarsModern").finalizedBy(tasks.getByName("copyJarsLegacy"))
+copyTask("copyJarsLegacy", file("${project.rootDir}/legacy-test-server/plugins/"))
+copyTask("copyJarsPaper", file("${project.rootDir}/test-server-1.20.4/run/plugins/"))
+copyTask("copyJarsSpigot", file("${project.rootDir}/spigot-test-server/plugins/"))
 
 repositories {
     mavenCentral()

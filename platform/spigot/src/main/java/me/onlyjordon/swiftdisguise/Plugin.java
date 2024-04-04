@@ -1,5 +1,7 @@
 package me.onlyjordon.swiftdisguise;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import me.onlyjordon.swiftdisguise.api.DisguiseData;
 import me.onlyjordon.swiftdisguise.api.SwiftDisguise;
 import me.onlyjordon.swiftdisguise.api.SwiftDisguiseLoader;
@@ -13,11 +15,22 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Plugin extends JavaPlugin implements Listener {
+
+    @Override
+    public void onLoad() {
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        PacketEvents.getAPI().getSettings().reEncodeByDefault(true)
+                .checkForUpdates(true)
+                .bStats(true);
+        PacketEvents.getAPI().load();
+    }
+
     @Override
     public void onEnable() {
         super.onEnable();
         Bukkit.getPluginManager().registerEvents(this, this);
         SwiftDisguiseLoader.load();
+        PacketEvents.getAPI().init();
     }
 
     @Override

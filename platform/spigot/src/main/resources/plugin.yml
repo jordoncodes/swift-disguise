@@ -1,7 +1,4 @@
 name: "SwiftDisguise"
 main: "me.onlyjordon.swiftdisguise.Plugin"
-version: "2.3.1"
+version: "2.3.2"
 author: "onlyjordon"
-depend: [
-  "packetevents"
-]
