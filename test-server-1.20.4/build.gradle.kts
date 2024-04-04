@@ -1,5 +1,3 @@
-import java.util.stream.Collectors
-
 plugins {
     id("xyz.jpenilla.run-paper") version "2.2.3"
     id("com.github.johnrengelman.shadow") version "8.1.1"
