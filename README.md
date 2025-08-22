@@ -1,8 +1,8 @@
 # SwiftDisguise
+# THIS HAS BEEN DISCONTINUED
 This is a simple API that allows you to nickname a player. It currently supports Spigot (& forks) 1.8.8 to 1.20.4. For users running servers that don't run java 11+, I would recommend using a Java 11+ fork like [PandaSpigot (1.8.8)](https://github.com/hpfxd/PandaSpigot).
 Used in:
 - [CapeHider (plugin)](https://github.com/jordoncodes/CapeHider)
-- [1hour1life (server)](https://discord.gg/qcUDTArQC7)
 ## Features:
 The main features of this API are: changing a player's name, changing a player's skin, giving the player a prefix/suffix using a scoreboard team packet. If you want a new version, feel free to make an issue!
 
